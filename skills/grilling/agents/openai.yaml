@@ -1,0 +1,3 @@
+interface:
+  display_name: "Grilling"
+  short_description: "한 라운드씩 질문을 던지며 생각을 검증합니다"
