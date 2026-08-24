@@ -1,13 +1,13 @@
 # jinyoo-skills
 
-Claude Code · Codex 가 함께 쓰는 개인 스킬과 공용 지침의 단일 소스(SSOT).
+Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 설치하면 대상 프로젝트의 host 별 경로로 복사된다.
 
 | 대상 | 설치 위치 |
 |------|-----------|
 | Claude Code 스킬 | `<project>/.claude/skills/<name>/` |
 | Codex 스킬 | `<project>/.agents/skills/<name>/` |
-| 공용 지침 | `<project>/CLAUDE.md` 의 `<!-- jinyoo-skills:start/end -->` 블록 (`AGENTS.md` 가 없으면 `CLAUDE.md` 로의 symlink 생성) |
+| 지침 문서 | `CLAUDE.md`·`AGENTS.md` 중 한쪽만 있으면 없는 쪽을 symlink 로 연결 (내용은 건드리지 않음) |
 
 ## 설치 / 업데이트
 
@@ -26,7 +26,7 @@ bash ~/Dev/jinyoo-skills/install.sh /path/to/project
 
 - 설치한 스킬 목록은 `<project>/.jinyoo-skills.json` 에 기록된다. 재설치 시 여기 있는데 upstream 에서 사라진 스킬은 삭제된다.
 - 프로젝트에 이미 **같은 이름의 고유 스킬**이 있으면 덮어쓰지 않고 skip 한다.
-- 설치본·지침 블록은 생성물이다. 대상 프로젝트에서 직접 고치면 재설치 때 덮어써진다 — 이 레포에서 고친다.
+- 설치본은 생성물이다. 대상 프로젝트에서 직접 고치면 재설치 때 덮어써진다 — 이 레포에서 고친다.
 
 ## 구조
 
@@ -36,7 +36,6 @@ skills/
     SKILL.md            양 host 공용 원본 = 설치본 (frontmatter + 본문)
     agents/openai.yaml  Codex 전용 UI 메타 (선택, Claude 는 무시)
     references/ 등      SKILL.md 가 참조하는 리소스 (선택)
-instructions/common.md  CLAUDE.md 블록으로 주입되는 공용 지침
 scripts/install.py      설치
 scripts/selfcheck.sh    install.py 셀프체크
 install.sh              git pull + install.py 실행
