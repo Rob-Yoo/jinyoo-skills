@@ -1,0 +1,5 @@
+interface:
+  display_name: "Grill with ADR"
+  short_description: "grilling 후 남길 결정을 ADR 로 기록합니다"
+policy:
+  allow_implicit_invocation: false
