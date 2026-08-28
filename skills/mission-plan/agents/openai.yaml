@@ -1,0 +1,5 @@
+interface:
+  display_name: "Mission Plan"
+  short_description: "큰 기능의 설계 결정, 계획, Phase Overview 를 만듭니다"
+policy:
+  allow_implicit_invocation: false

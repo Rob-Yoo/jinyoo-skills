@@ -4,7 +4,7 @@ description: 매 라운드 질문과 추천안을 다른 에이전트(Claude ↔
 disable-model-invocation: true
 ---
 
-이 스킬 디렉토리 기준 `../grill-with-adr/SKILL.md` 를 읽고 그대로 진행한다. 아래만 다르다.
+이 스킬 디렉토리 기준 `../grilling/SKILL.md` 를 읽고 그대로 진행한다. 아래만 다르다.
 
 ## 맥락 파일
 
@@ -44,4 +44,4 @@ disable-model-invocation: true
 
 ## 종료
 
-grilling 의 종료 조건과 같다. 끝나면 맥락 파일 경로를 합의된 설계 문서로 알려주고, grill-with-adr 의 세션 끝 절차(ADR 후보)를 이어서 진행한다.
+grilling 의 종료 조건과 같다. 끝나면 맥락 파일 경로를 합의된 설계 문서로 알려준다.
