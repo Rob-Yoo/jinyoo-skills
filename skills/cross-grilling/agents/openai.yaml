@@ -1,0 +1,5 @@
+interface:
+  display_name: "Cross Grilling"
+  short_description: "다른 에이전트의 교차 검증을 거치며 grilling 을 진행합니다"
+policy:
+  allow_implicit_invocation: false
