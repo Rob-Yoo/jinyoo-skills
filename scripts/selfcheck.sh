@@ -29,7 +29,7 @@ python3 "$REPO/scripts/install.py" "$Q" >/dev/null 2>&1
 [ "$(cat "$Q/.claude/skills/grilling/SKILL.md")" = "own" ] || fail "프로젝트 고유 스킬 덮어씀"
 
 # 4. upstream 에서 사라진 스킬은 재설치 시 삭제
-echo '{"claude": ["grilling", "gone"], "codex": ["grilling"]}' > "$P/.jinyoo-skills.json"
+python3 -c 'import json,sys; p=sys.argv[1]; m=json.load(open(p)); m["claude"].append("gone"); json.dump(m, open(p, "w"))' "$P/.jinyoo-skills.json"
 mkdir -p "$P/.claude/skills/gone"
 python3 "$REPO/scripts/install.py" "$P" >/dev/null
 [ ! -e "$P/.claude/skills/gone" ] || fail "stale 스킬 미삭제"
