@@ -22,6 +22,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
 | [implement](skills/implement/SKILL.md) | 사용자만 | 테스트 주도 구현과 두 축 리뷰까지 진행합니다 |
+| [ios-sim-test](skills/ios-sim-test/SKILL.md) | 사용자만 | iOS 시뮬레이터로 체크리스트를 판정하고 근거 보고서를 만듭니다 |
 | [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
 | [refactor-like-fowler](skills/refactor-like-fowler/SKILL.md) | 사용자만 | Fowler 의 규율로 재작성 없이 한 기법씩 리팩터링합니다 |
 | [second-opinion](skills/second-opinion/SKILL.md) | 자동 호출 가능 | 다른 에이전트에게 독립적인 의견을 받습니다 |
