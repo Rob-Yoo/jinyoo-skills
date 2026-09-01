@@ -1,0 +1,5 @@
+interface:
+  display_name: "Implement"
+  short_description: "테스트 주도 구현과 두 축 리뷰까지 진행합니다"
+policy:
+  allow_implicit_invocation: false

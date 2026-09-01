@@ -14,14 +14,18 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 <!-- skills:start -->
 | 스킬 | 호출 | 설명 |
 |------|------|------|
+| [code-review](skills/code-review/SKILL.md) | 자동 호출 가능 | 변경을 Standards 와 Spec 두 축으로 리뷰합니다 |
+| [codebase-design](skills/codebase-design/SKILL.md) | 자동 호출 가능 | deep module 설계 용어와 원칙을 제공합니다 |
 | [cross-grilling](skills/cross-grilling/SKILL.md) | 사용자만 | 다른 에이전트의 교차 검증을 거치며 grilling 을 진행합니다 |
 | [doc-writer-for-agents](skills/doc-writer-for-agents/SKILL.md) | 자동 호출 가능 | 에이전트가 읽는 문서를 씁니다 |
 | [explain-for-junior](skills/explain-for-junior/SKILL.md) | 자동 호출 가능 | 실제 예시와 애니메이션으로 주니어에게 설명합니다 |
 | [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
+| [implement](skills/implement/SKILL.md) | 사용자만 | 테스트 주도 구현과 두 축 리뷰까지 진행합니다 |
 | [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
 | [refactor-like-fowler](skills/refactor-like-fowler/SKILL.md) | 사용자만 | Fowler 의 규율로 재작성 없이 한 기법씩 리팩터링합니다 |
 | [second-opinion](skills/second-opinion/SKILL.md) | 자동 호출 가능 | 다른 에이전트에게 독립적인 의견을 받습니다 |
+| [tdd](skills/tdd/SKILL.md) | 자동 호출 가능 | 합의한 seam 에서 red-green 으로 테스트 주도 구현합니다 |
 <!-- skills:end -->
 
 ## 설치 / 업데이트
