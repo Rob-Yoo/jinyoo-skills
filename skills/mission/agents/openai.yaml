@@ -1,0 +1,5 @@
+interface:
+  display_name: "Mission"
+  short_description: "큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다"
+policy:
+  allow_implicit_invocation: false

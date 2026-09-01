@@ -1,10 +1,6 @@
----
-name: mission-plan
-description: 큰 기능을 cross-grilling 으로 설계하고, 계획 문서와 Phase Overview 를 만든다.
-disable-model-invocation: true
----
+# Plan
 
-여러 세션에 걸쳐 구현할 큰 기능을 계획한다. 설계 결정을 확정하고, 계획 문서와 Phase Overview 를 `Docs/tmp/` 에 만든다. `Docs/tmp/` 는 미션이 진행되는 동안의 작업 공간이다. 미션이 끝나면 이 문서들을 바탕으로 ADR 을 쓰고 지운다.
+여러 세션에 걸쳐 구현할 큰 기능을 계획한다. 설계 결정을 확정하고, 계획 문서와 Phase Overview 를 `Docs/wip/` 에 만든다. `Docs/wip/` 는 미션이 진행되는 동안의 작업 공간이다. 미션이 끝나면 이 문서들을 바탕으로 ADR 을 쓰고 지운다.
 
 ## 1. 설계 결정
 
@@ -14,12 +10,12 @@ disable-model-invocation: true
 
 Plan 문서를 남기는 목적은, 작업이 모두 끝났을 때 ADR 을 누락 없이 쓰기 위해서다.
 
-`Docs/tmp/plan/<slug>.md` 에 쓴다. cross-grilling 의 맥락 파일 (목표, 확정된 결정, 확인된 사실) 을 바탕으로 정리한다. 미션이 끝나 ADR 을 쓸 때 grilling 대화는 남아 있지 않다. 그래서 결정마다 사유와 버린 대안을 대화에서 옮겨 둔다. 사용자가 말한 이유를 쓰고, 대화에 없는 이유는 쓰지 않는다.
+`Docs/wip/plan/<slug>.md` 에 쓴다. cross-grilling 의 맥락 파일 (목표, 확정된 결정, 확인된 사실) 을 바탕으로 정리한다. 미션이 끝나 ADR 을 쓸 때 grilling 대화는 남아 있지 않다. 그래서 결정마다 사유와 버린 대안을 대화에서 옮겨 둔다. 사용자가 말한 이유를 쓰고, 대화에 없는 이유는 쓰지 않는다.
 
 ```markdown
 # <기능명> 구현 계획
 
-> 작성: YYYY-MM-DD · Overview: `Docs/tmp/task/<slug>/<slug>-phases-overview.md`
+> 작성: YYYY-MM-DD · Overview: `Docs/wip/task/<slug>/<slug>-phases-overview.md`
 
 ## 목표
 <사용자가 처음 말한 계획 원문 + 한 줄 요약>
@@ -51,12 +47,12 @@ Overview 를 쓰기 전에 Phase 목록 (제목, 목표, 완료 기준) 을 사�
 
 ## 4. Phase Overview
 
-`Docs/tmp/task/<slug>/<slug>-phases-overview.md` 에 쓴다. 세션을 넘어 미션을 이어가는 상태 문서다. 이 문서만 읽어도 어디까지 했고 다음에 무엇을 할지 알 수 있게 쓴다. 파일 경로, 담당자처럼 금방 낡는 내용은 넣지 않는다.
+`Docs/wip/task/<slug>/<slug>-phases-overview.md` 에 쓴다. 세션을 넘어 미션을 이어가는 상태 문서다. 이 문서만 읽어도 어디까지 했고 다음에 무엇을 할지 알 수 있게 쓴다. 파일 경로, 담당자처럼 금방 낡는 내용은 넣지 않는다.
 
 ```markdown
 # <기능명> Phases
 
-> Plan: `Docs/tmp/plan/<slug>.md` · 작성: YYYY-MM-DD
+> Plan: `Docs/wip/plan/<slug>.md` · 작성: YYYY-MM-DD
 > base: <미정> · 부모 브랜치: <미정>
 > Phase 를 시작하면 [진행중], 끝내면 [완료] 로 바꾼다. 실행 중 생긴 결정·변경·발견은 그 순간 해당 Phase 의 `기록` 에 적는다.
 

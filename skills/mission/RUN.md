@@ -1,10 +1,6 @@
----
-name: mission-run
-description: Phase Overview 의 Phase 하나를 설계 결정부터 구현, 검증, 완료까지 진행한다.
-disable-model-invocation: true
----
+# Run
 
-Phase Overview (`Docs/tmp/task/<slug>/<slug>-phases-overview.md`) 의 Phase 하나를 진행한다. Overview 헤더에는 Plan 경로, base, 부모 브랜치가 있고, 각 Phase 는 `## P{N} <제목> [상태]` 아래에 목표, 범위, 완료 기준, `기록` 을 가진다. Phase 의존은 선형이다. Plan 은 헤더가 가리키는 문서다. 인자는 `P{N}` (생략하면 다음 Phase) 과 `cross` (Phase 설계에 cross-grilling 사용) 다.
+Phase Overview (`Docs/wip/task/<slug>/<slug>-phases-overview.md`) 의 Phase 하나를 진행한다. Overview 헤더에는 Plan 경로, base, 부모 브랜치가 있고, 각 Phase 는 `## P{N} <제목> [상태]` 아래에 목표, 범위, 완료 기준, `기록` 을 가진다. Phase 의존은 선형이다. Plan 은 헤더가 가리키는 문서다.
 
 Overview 문서를 남기며 작업하는 목적은, 작업이 모두 끝났을 때 ADR 을 누락 없이 쓰기 위해서다. ADR 의 재료는 Plan 의 설계 결정 표와 Overview 의 Phase 별 `기록` 두 곳뿐이다. 그래서 실행 중에 생긴 것은 그 순간 `기록` 에 남긴다.
 
@@ -23,10 +19,9 @@ Phase 항목의 `기록:` 아래에 한 줄씩 덧붙인다. 세 조건으로 �
 
 ## 1. 시작
 
-1. `Docs/tmp/task/*/*-phases-overview.md` 를 찾는다. 하나면 그것을 쓰고, 여럿이면 사용자에게 묻는다.
-2. Phase 를 고른다: 인자로 받은 `P{N}`, 없으면 `[진행중]` Phase, 그것도 없으면 첫 `[미착수]` Phase. `[진행중]` Phase 는 이전 세션의 작업을 이어서 한다: Overview 와 Phase 브랜치의 변경을 읽고 남은 일부터 한다.
-3. 앞 Phase 가 `[완료]` 가 아니면 경고한다.
-4. 목표와 완료 기준을 보여주고 확인받은 뒤 상태를 `[진행중]` 으로 바꾼다.
+1. Phase 를 고른다: 지정받은 `P{N}`, 없으면 `[진행중]` Phase, 그것도 없으면 첫 `[미착수]` Phase. `[진행중]` Phase 는 이전 세션의 작업을 이어서 한다: Overview 와 Phase 브랜치의 변경을 읽고 남은 일부터 한다.
+2. 앞 Phase 가 `[완료]` 가 아니면 경고한다.
+3. 목표와 완료 기준을 보여주고 확인받은 뒤 상태를 `[진행중]` 으로 바꾼다.
 
 ## 2. 브랜치
 
@@ -39,7 +34,7 @@ base 브랜치에서 부모 브랜치를 따고, 각 Phase 브랜치는 부모 �
 
 ## 3. Phase 설계
 
-이 스킬 디렉토리 기준 `../grilling/SKILL.md` 를 따른다. 인자가 `cross` 면 `../cross-grilling/SKILL.md` 를 따른다. 범위는 이번 Phase 에서 Plan 이 아직 정하지 않은 것이다: Plan 표에 있는 결정은 다시 묻지 않는다. 열린 결정이 없으면 그렇게 알리고 구현으로 넘어간다. 확정된 결정은 그 자리에서 `기록` 에 `[결정]` 으로 적는다.
+이 스킬 디렉토리 기준 `../grilling/SKILL.md` 를 따른다. 사용자가 교차 검증을 요청하면 `../cross-grilling/SKILL.md` 를 따른다. 범위는 이번 Phase 에서 Plan 이 아직 정하지 않은 것이다: Plan 표에 있는 결정은 다시 묻지 않는다. 열린 결정이 없으면 그렇게 알리고 구현으로 넘어간다. 확정된 결정은 그 자리에서 `기록` 에 `[결정]` 으로 적는다.
 
 ## 4. 구현과 검증
 
@@ -67,4 +62,4 @@ base 브랜치에서 부모 브랜치를 따고, 각 Phase 브랜치는 부모 �
 3. `기록` 점검을 마쳤다.
 4. 사용자가 이 Phase 를 끝내도 된다고 확인했다.
 
-그다음 다음 `[미착수]` Phase 를 알린다. 마지막 Phase 였으면 미션 종료를 안내한다: Plan 의 설계 결정 표와 Overview 의 `기록` 으로 ADR 을 쓰고 (`../grill-with-adr/ADR-FORMAT.md`), `Docs/tmp/plan/<slug>.md` 와 `Docs/tmp/task/<slug>/` 를 정리할 차례다.
+그다음 다음 `[미착수]` Phase 를 알린다. 마지막 Phase 였으면 그렇다고 알린다.

@@ -1,5 +1,0 @@
-interface:
-  display_name: "Mission Run"
-  short_description: "미션의 Phase 하나를 설계부터 완료까지 진행합니다"
-policy:
-  allow_implicit_invocation: false
