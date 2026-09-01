@@ -6,9 +6,23 @@
 # 성공: stdout 에 결과 파일 경로 한 줄. 실패(CLI 오류·빈 결과): stderr 메시지 + exit 1.
 set -euo pipefail
 
-# macOS 에는 timeout 명령이 없다. perl 이 alarm 을 건 뒤 exec 로 상대 CLI 가 되므로 남는 자식이 없다.
+# macOS 에는 timeout 명령이 없어 perl 로 건다. 시간이 넘으면 상대 CLI 의 자손 프로세스를
+# 모두 모아 함께 끝낸다: 상대가 따로 띄운 셸 명령 (codex 는 별도 프로세스 그룹으로 띄운다) 까지 남지 않게.
 TIMEOUT="${SECOND_OPINION_TIMEOUT:-600}"
-limit() { perl -e 'alarm shift; exec @ARGV or die "exec: $!\n"' "$TIMEOUT" "$@"; }
+limit() {
+  perl -e '
+    my $t = shift; my $pid = fork; die "fork: $!\n" unless defined $pid;
+    if (!$pid) { exec @ARGV or die "exec: $!\n" }
+    sub tree {
+      my %kids; for (`ps -axo pid=,ppid=`) { my ($p, $pp) = split; push @{$kids{$pp}}, $p }
+      my @all = ($pid); for (my $i = 0; $i < @all; $i++) { push @all, @{$kids{$all[$i]} || []} }
+      @all;
+    }
+    $SIG{ALRM} = sub { my @all = tree(); kill "TERM", @all; sleep 2; kill "KILL", @all; exit 142 };
+    alarm $t; waitpid $pid, 0;
+    exit($? & 127 ? 128 + ($? & 127) : $? >> 8);
+  ' "$TIMEOUT" "$@"
+}
 
 case "${1:-}" in
   codex)
