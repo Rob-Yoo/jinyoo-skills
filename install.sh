@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # jinyoo-skills 를 프로젝트에 설치/업데이트한다. 로컬 클론에서 실행.
 #   bash ~/Dev/jinyoo-skills/install.sh [/path/to/project]   # 기본값: 현재 디렉토리
+#   bash ~/Dev/jinyoo-skills/install.sh --global             # 전역 지침에 Karpathy·Ponytail 이 없으면 추가
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

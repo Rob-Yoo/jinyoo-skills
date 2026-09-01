@@ -34,7 +34,19 @@ mkdir -p "$P/.claude/skills/gone"
 python3 "$REPO/scripts/install.py" "$P" >/dev/null
 [ ! -e "$P/.claude/skills/gone" ] || fail "stale 스킬 미삭제"
 
-# 5. README 스킬 목록이 skills/ 와 일치
+# 5. --global: 없는 블록만 원문 그대로 덧붙이고, 있으면 건드리지 않음
+H="$(mktemp -d)"; trap 'rm -rf "$P" "$H"' EXIT
+g() { HOME="$H" CODEX_HOME="$H/codex" python3 "$REPO/scripts/install.py" --global >/dev/null; }
+mkdir -p "$H/codex"; printf '# AGENTS.md\n\nmine\n\n# Ponytail — Lazy Senior Dev Mode\n\ncustom\n' > "$H/codex/AGENTS.md"
+g
+for f in karpathy ponytail; do grep -qF "$(head -1 "$REPO/instructions/$f.md")" "$H/.claude/CLAUDE.md" || fail "전역 claude 에 $f 없음"; done
+[ "$(grep -c '^# Ponytail' "$H/codex/AGENTS.md")" = 1 ] || fail "있는 Ponytail 중복 추가"
+grep -q '^custom$' "$H/codex/AGENTS.md" || fail "기존 내용 훼손"
+grep -q '^## 1. Think Before Coding$' "$H/codex/AGENTS.md" || fail "codex 에 karpathy 미추가"
+before="$(cat "$H/.claude/CLAUDE.md" "$H/codex/AGENTS.md")"; g
+[ "$before" = "$(cat "$H/.claude/CLAUDE.md" "$H/codex/AGENTS.md")" ] || fail "--global 재실행이 파일을 바꿈"
+
+# 6. README 스킬 목록이 skills/ 와 일치
 python3 "$REPO/scripts/sync-readme.py" --check || fail "README 스킬 목록"
 
 echo "selfcheck OK"

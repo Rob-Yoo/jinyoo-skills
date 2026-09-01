@@ -34,6 +34,9 @@ git clone git@github.com:Rob-Yoo/jinyoo-skills.git ~/Dev/jinyoo-skills
 # 프로젝트에 설치 / 업데이트 (git pull 후 설치)
 bash ~/Dev/jinyoo-skills/install.sh                    # 현재 디렉토리
 bash ~/Dev/jinyoo-skills/install.sh /path/to/project
+
+# 새 머신: 전역 지침에 Karpathy 4원칙·Ponytail 이 없으면 원문 그대로 추가
+bash ~/Dev/jinyoo-skills/install.sh --global
 ```
 
 필요: `git`, `python3` (표준 라이브러리만 사용).
@@ -50,6 +53,7 @@ skills/
     SKILL.md            양 host 공용 원본 = 설치본 (frontmatter + 본문)
     agents/openai.yaml  Codex UI 메타 + README 목록의 한 줄 설명 (필수, Claude 는 무시)
     references/ 등      SKILL.md 가 참조하는 리소스 (선택)
+instructions/           --global 이 덧붙이는 전역 지침 원문 (karpathy.md, ponytail.md)
 scripts/install.py      설치
 scripts/selfcheck.sh    install.py 셀프체크 + README 스킬 목록 최신 여부 검사
 scripts/sync-readme.py  README 스킬 목록 생성 (--check: 확인만)

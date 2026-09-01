@@ -7,12 +7,15 @@
    SKILL.md 는 host 중립으로 작성한다 (README 참고). Claude 전용 frontmatter 키는 Codex 가
    무시하고, Codex 전용 메타는 agents/openai.yaml 에 둔다(Claude 가 무시).
 2. 지침: CLAUDE.md·AGENTS.md 중 한쪽만 있으면 없는 쪽을 symlink 로 연결 (둘 다 없으면 무동작).
+3. --global: 전역 ~/.claude/CLAUDE.md·$CODEX_HOME/AGENTS.md 에 instructions/ 의 Karpathy·Ponytail
+   블록 중 없는 것만 원문 그대로 덧붙인다. 프로젝트는 건드리지 않는다.
 
 설치한 스킬 이름은 <project>/.jinyoo-skills.json 에 기록한다. 재설치 시
   - 기록에 없는데 같은 이름이 이미 있으면 프로젝트 고유 스킬로 보고 건드리지 않는다(skip).
   - 기록에 있는데 upstream 에서 사라진 스킬은 삭제한다.
 
 Usage: install.py [project-dir]   # 기본값: 현재 디렉토리
+       install.py --global
 """
 import json
 import os
@@ -63,7 +66,35 @@ def link_instructions(dest):
             print(f"linked: {link.name} -> {real.name}")
 
 
+# 전역 지침에 넣을 블록: (이미 적혀 있다고 보는 제목 줄, 원문 파일). 이 순서로 덧붙인다.
+GLOBAL_BLOCKS = [
+    ("## 1. Think Before Coding", "karpathy.md"),
+    ("# Ponytail — Lazy Senior Dev Mode", "ponytail.md"),
+]
+
+
+def install_global():
+    """전역 CLAUDE.md·AGENTS.md 에 없는 블록만 원문 그대로 맨 뒤에 덧붙인다. 있는 블록은 내용이 달라도 건드리지 않는다."""
+    home = Path.home()
+    targets = [home / ".claude" / "CLAUDE.md",
+               Path(os.environ.get("CODEX_HOME", home / ".codex")) / "AGENTS.md"]
+    for target in targets:
+        text = target.read_text() if target.exists() else ""
+        lines = text.splitlines()
+        missing = [f for title, f in GLOBAL_BLOCKS if title not in lines]
+        if not missing:
+            print(f"skip: {target} (이미 있음)")
+            continue
+        add = "\n\n".join((REPO / "instructions" / f).read_text().strip() for f in missing)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text.rstrip("\n") + ("\n\n" if text.strip() else "") + add + "\n")
+        print(f"appended: {target} <- {', '.join(missing)}")
+
+
 def main():
+    if sys.argv[1:] == ["--global"]:
+        install_global()
+        return 0
     dest = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
     if not dest.is_dir():
         print(f"error: 디렉토리가 아님: {dest}", file=sys.stderr)
