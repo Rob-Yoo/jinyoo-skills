@@ -1,0 +1,5 @@
+interface:
+  display_name: "Refactor like Fowler"
+  short_description: "Fowler 의 규율로 재작성 없이 한 기법씩 리팩터링합니다"
+policy:
+  allow_implicit_invocation: false

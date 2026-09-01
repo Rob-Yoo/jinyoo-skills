@@ -20,6 +20,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
 | [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
+| [refactor-like-fowler](skills/refactor-like-fowler/SKILL.md) | 사용자만 | Fowler 의 규율로 재작성 없이 한 기법씩 리팩터링합니다 |
 | [second-opinion](skills/second-opinion/SKILL.md) | 자동 호출 가능 | 다른 에이전트에게 독립적인 의견을 받습니다 |
 <!-- skills:end -->
 
@@ -74,7 +75,7 @@ SKILL.md 하나를 Claude Code·Codex 가 그대로 읽으므로 **본문에 한
 
 frontmatter 필수 키는 `name`·`description` 뿐. Claude 전용 키(`disable-model-invocation`, `argument-hint`, `allowed-tools` 등)는 넣어도 Codex 가 무시한다.
 
-host 전용 문법이 꼭 필요한 스킬이 생기면 그때 렌더 단계를 도입한다 (참고: c8c-swift `scripts/render-skills.py`).
+host 전용 문법이 꼭 필요한 스킬이 생기면 그때 렌더 단계를 도입한다.
 
 ## 스킬 추가 · 수정 · 삭제
 
