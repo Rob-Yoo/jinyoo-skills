@@ -70,25 +70,25 @@ interface 를 설계할 때 묻는다:
 
 1. **의존성을 만들지 말고 받는다.**
 
-   ```typescript
+   ```swift
    // 테스트하기 쉽다
-   function processOrder(order, paymentGateway) {}
+   func processOrder(_ order: Order, paymentGateway: PaymentGateway) {}
 
    // 테스트하기 어렵다
-   function processOrder(order) {
-     const gateway = new StripeGateway();
+   func processOrder(_ order: Order) {
+       let gateway = StripeGateway()
    }
    ```
 
 2. **부수효과를 만들지 말고 결과를 돌려준다.**
 
-   ```typescript
+   ```swift
    // 테스트하기 쉽다
-   function calculateDiscount(cart): Discount {}
+   func calculateDiscount(_ cart: Cart) -> Discount {}
 
    // 테스트하기 어렵다
-   function applyDiscount(cart): void {
-     cart.total -= discount;
+   func applyDiscount(_ cart: Cart) {
+       cart.total -= discount
    }
    ```
 
@@ -105,7 +105,7 @@ interface 를 설계할 때 묻는다:
 ## 채택하지 않은 관점
 
 - **depth 를 implementation 줄 수 대 interface 줄 수의 비율로 보는 것** (Ousterhout): implementation 을 부풀리는 것을 보상한다. 여기서는 depth 를 leverage 로 본다.
-- **"Interface" 를 TypeScript `interface` 키워드나 클래스의 public 메서드로 보는 것**: 너무 좁다. 여기서 interface 는 호출자가 알아야 하는 모든 사실이다.
+- **"Interface" 를 Swift `protocol` 이나 타입의 public 메서드로 보는 것**: 너무 좁다. 여기서 interface 는 호출자가 알아야 하는 모든 사실이다.
 - **"Boundary"**: DDD 의 bounded context 와 겹친다. **seam** 이나 **interface** 라고 말한다.
 
 ## 더 깊이

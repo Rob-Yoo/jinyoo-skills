@@ -21,16 +21,16 @@ mock 하지 않는 것:
 
 외부 의존성을 안에서 만들지 말고 넘겨받는다:
 
-```typescript
+```swift
 // mock 하기 쉽다
-function processPayment(order, paymentClient) {
-  return paymentClient.charge(order.total);
+func processPayment(_ order: Order, client: PaymentClient) async throws -> Receipt {
+    try await client.charge(order.total)
 }
 
 // mock 하기 어렵다
-function processPayment(order) {
-  const client = new StripeClient(process.env.STRIPE_KEY);
-  return client.charge(order.total);
+func processPayment(_ order: Order) async throws -> Receipt {
+    let client = StripeClient(apiKey: ProcessInfo.processInfo.environment["STRIPE_KEY"] ?? "")
+    return try await client.charge(order.total)
 }
 ```
 
@@ -38,18 +38,18 @@ function processPayment(order) {
 
 조건 로직이 든 범용 함수 하나 대신 외부 작업마다 함수를 만든다:
 
-```typescript
+```swift
 // GOOD: 함수마다 독립적으로 mock 할 수 있다
-const api = {
-  getUser: (id) => fetch(`/users/${id}`),
-  getOrders: (userId) => fetch(`/users/${userId}/orders`),
-  createOrder: (data) => fetch('/orders', { method: 'POST', body: data }),
-};
+protocol UserAPI {
+    func getUser(id: User.ID) async throws -> User
+    func getOrders(userID: User.ID) async throws -> [Order]
+    func createOrder(_ draft: OrderDraft) async throws -> Order
+}
 
 // BAD: mock 안에 조건 로직이 필요하다
-const api = {
-  fetch: (endpoint, options) => fetch(endpoint, options),
-};
+protocol UserAPI {
+    func fetch(_ endpoint: String, method: String, body: Data?) async throws -> Data
+}
 ```
 
 SDK 방식이면:

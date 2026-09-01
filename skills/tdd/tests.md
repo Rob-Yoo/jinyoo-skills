@@ -4,14 +4,14 @@
 
 **통합 스타일**: 내부 부품의 mock 이 아니라 실제 interface 로 테스트한다.
 
-```typescript
+```swift
 // GOOD: 관찰 가능한 동작을 테스트한다
-test("user can checkout with valid cart", async () => {
-  const cart = createCart();
-  cart.add(product);
-  const result = await checkout(cart, paymentMethod);
-  expect(result.status).toBe("confirmed");
-});
+@Test func userCanCheckoutWithValidCart() async throws {
+    let cart = Cart()
+    cart.add(product)
+    let result = try await checkout(cart, paymentMethod: paymentMethod)
+    #expect(result.status == .confirmed)
+}
 ```
 
 특징:
@@ -26,13 +26,13 @@ test("user can checkout with valid cart", async () => {
 
 **implementation 세부 테스트**: 내부 구조에 결합돼 있다.
 
-```typescript
+```swift
 // BAD: implementation 세부를 테스트한다
-test("checkout calls paymentService.process", async () => {
-  const mockPayment = jest.mock(paymentService);
-  await checkout(cart, payment);
-  expect(mockPayment.process).toHaveBeenCalledWith(cart.total);
-});
+@Test func checkoutCallsPaymentServiceProcess() async throws {
+    let mockPayment = MockPaymentService()
+    _ = try await checkout(cart, paymentService: mockPayment)
+    #expect(mockPayment.processCalls == [cart.total])
+}
 ```
 
 경고 신호:
@@ -44,34 +44,34 @@ test("checkout calls paymentService.process", async () => {
 - 테스트 이름이 WHAT 이 아니라 HOW 를 말한다
 - interface 대신 외부 수단으로 검증한다
 
-```typescript
+```swift
 // BAD: interface 를 우회해 검증한다
-test("createUser saves to database", async () => {
-  await createUser({ name: "Alice" });
-  const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
-  expect(row).toBeDefined();
-});
+@Test func createUserSavesToDatabase() async throws {
+    _ = try await createUser(name: "Alice")
+    let row = try db.query("SELECT * FROM users WHERE name = ?", ["Alice"])
+    #expect(row != nil)
+}
 
 // GOOD: interface 로 검증한다
-test("createUser makes user retrievable", async () => {
-  const user = await createUser({ name: "Alice" });
-  const retrieved = await getUser(user.id);
-  expect(retrieved.name).toBe("Alice");
-});
+@Test func createUserMakesUserRetrievable() async throws {
+    let user = try await createUser(name: "Alice")
+    let retrieved = try await getUser(id: user.id)
+    #expect(retrieved.name == "Alice")
+}
 ```
 
 **Tautological 테스트**: 기댓값이 implementation 을 그대로 다시 말해 구조상 통과한다.
 
-```typescript
+```swift
 // BAD: 기댓값을 코드가 계산하는 방식으로 다시 계산한다
-test("calculateTotal sums line items", () => {
-  const items = [{ price: 10 }, { price: 5 }];
-  const expected = items.reduce((sum, i) => sum + i.price, 0);
-  expect(calculateTotal(items)).toBe(expected);
-});
+@Test func calculateTotalSumsLineItems() {
+    let items = [LineItem(price: 10), LineItem(price: 5)]
+    let expected = items.reduce(0) { $0 + $1.price }
+    #expect(calculateTotal(items) == expected)
+}
 
 // GOOD: 기댓값이 독립된, 알려진 리터럴이다
-test("calculateTotal sums line items", () => {
-  expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
-});
+@Test func calculateTotalSumsLineItems() {
+    #expect(calculateTotal([LineItem(price: 10), LineItem(price: 5)]) == 15)
+}
 ```
