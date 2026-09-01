@@ -34,4 +34,7 @@ mkdir -p "$P/.claude/skills/gone"
 python3 "$REPO/scripts/install.py" "$P" >/dev/null
 [ ! -e "$P/.claude/skills/gone" ] || fail "stale 스킬 미삭제"
 
+# 5. README 스킬 목록이 skills/ 와 일치
+python3 "$REPO/scripts/sync-readme.py" --check || fail "README 스킬 목록"
+
 echo "selfcheck OK"

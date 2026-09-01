@@ -9,6 +9,20 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | Codex 스킬 | `<project>/.agents/skills/<name>/` |
 | 지침 문서 | `CLAUDE.md`·`AGENTS.md` 중 한쪽만 있으면 없는 쪽을 symlink 로 연결 (내용은 건드리지 않음) |
 
+## 스킬
+
+<!-- skills:start -->
+| 스킬 | 호출 | 설명 |
+|------|------|------|
+| [cross-grilling](skills/cross-grilling/SKILL.md) | 사용자만 | 다른 에이전트의 교차 검증을 거치며 grilling 을 진행합니다 |
+| [doc-writer-for-agents](skills/doc-writer-for-agents/SKILL.md) | 자동 호출 가능 | 에이전트가 읽는 문서를 씁니다 |
+| [explain-for-junior](skills/explain-for-junior/SKILL.md) | 자동 호출 가능 | 실제 예시와 애니메이션으로 주니어에게 설명합니다 |
+| [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
+| [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
+| [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
+| [second-opinion](skills/second-opinion/SKILL.md) | 자동 호출 가능 | 다른 에이전트에게 독립적인 의견을 받습니다 |
+<!-- skills:end -->
+
 ## 설치 / 업데이트
 
 private 레포 — SSH 인증된 머신에서 1회 클론 후 사용.
@@ -34,10 +48,11 @@ bash ~/Dev/jinyoo-skills/install.sh /path/to/project
 skills/
   <name>/
     SKILL.md            양 host 공용 원본 = 설치본 (frontmatter + 본문)
-    agents/openai.yaml  Codex 전용 UI 메타 (선택, Claude 는 무시)
+    agents/openai.yaml  Codex UI 메타 + README 목록의 한 줄 설명 (필수, Claude 는 무시)
     references/ 등      SKILL.md 가 참조하는 리소스 (선택)
 scripts/install.py      설치
-scripts/selfcheck.sh    install.py 셀프체크
+scripts/selfcheck.sh    install.py 셀프체크 + README 스킬 목록 최신 여부 검사
+scripts/sync-readme.py  README 스킬 목록 생성 (--check: 확인만)
 install.sh              git pull + install.py 실행
 ```
 
@@ -57,12 +72,13 @@ frontmatter 필수 키는 `name`·`description` 뿐. Claude 전용 키(`disable-
 
 host 전용 문법이 꼭 필요한 스킬이 생기면 그때 렌더 단계를 도입한다 (참고: c8c-swift `scripts/render-skills.py`).
 
-## 스킬 추가
+## 스킬 추가 · 수정 · 삭제
 
 ```bash
-mkdir -p skills/<name>
-# SKILL.md 작성 (grilling/ 참고), 필요시 agents/openai.yaml
+mkdir -p skills/<name>/agents
+# SKILL.md 와 agents/openai.yaml (short_description 필수) 작성 (grilling/ 참고)
+python3 scripts/sync-readme.py   # README 스킬 목록 갱신
 bash scripts/selfcheck.sh
 ```
 
-등록 단계 없음 — `skills/*/SKILL.md` 를 자동 발견한다.
+스킬을 고치거나 지울 때도 마지막 두 줄을 실행한다. 등록 단계 없음 — `skills/*/SKILL.md` 를 자동 발견한다.
