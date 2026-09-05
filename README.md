@@ -20,6 +20,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [explain-for-junior](skills/explain-for-junior/SKILL.md) | 자동 호출 가능 | 실제 예시와 애니메이션으로 주니어에게 설명합니다 |
 | [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
+| [hig-design](skills/hig-design/SKILL.md) | 사용자만 | HIG 에 맞춘 iPhone 화면 설계서와 클릭 프로토타입을 만듭니다 |
 | [impl-review](skills/impl-review/SKILL.md) | 자동 호출 가능 | 변경을 Standards 와 Spec 두 축으로 리뷰합니다 |
 | [implement](skills/implement/SKILL.md) | 사용자만 | 테스트 주도 구현과 두 축 리뷰까지 진행합니다 |
 | [ios-sim-test](skills/ios-sim-test/SKILL.md) | 사용자만 | iOS 시뮬레이터로 체크리스트를 판정하고 근거 보고서를 만듭니다 |

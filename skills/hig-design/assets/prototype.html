@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__ 프로토타입</title>
+<style>
+/* 페이지 크롬 (프로토타입 바깥) */
+:root {
+  --page-bg: #eef0f4; --page-surface: #ffffff; --page-ink: #1b2130; --page-muted: #5d6676; --page-line: #d8dde6; --page-accent: #2f5bd3;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --page-bg: #111318; --page-surface: #1a1d24; --page-ink: #e6e9ef; --page-muted: #9aa2b2; --page-line: #2c313c; --page-accent: #8ea8ff; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; }
+.page { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; padding: 24px 16px; }
+.side { flex: 1 1 300px; max-width: 420px; min-width: 0; display: grid; gap: 14px; }
+.card { background: var(--page-surface); border: 1px solid var(--page-line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; }
+.card h2 { margin: 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--page-muted); }
+.ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ctl button, .ctl select { font: inherit; border: 1px solid var(--page-line); background: var(--page-surface); color: var(--page-ink); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+.ctl button[aria-pressed="true"] { border-color: var(--page-accent); color: var(--page-accent); font-weight: 600; }
+.ctl label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.note dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; }
+.note dt { color: var(--page-muted); }
+.note dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.note a { color: var(--page-accent); }
+.note .id { font: 600 12px ui-monospace, Menlo, monospace; color: var(--page-accent); }
+.muted { color: var(--page-muted); }
+
+/* ── 앱 토큰: 기존 앱 디자인이 있으면 이 블록의 값만 바꾼다. 기본값은 iOS 시스템 색 ── */
+.phone {
+  --tint: #007aff;
+  --destructive: #ff3b30;
+  --success: #34c759;
+  --label: #000000;
+  --label-2: rgba(60, 60, 67, .6);
+  --label-3: rgba(60, 60, 67, .3);
+  --bg: #ffffff;
+  --bg-2: #f2f2f7;
+  --grouped-bg: #f2f2f7;
+  --grouped-bg-2: #ffffff;
+  --separator: rgba(60, 60, 67, .29);
+  --fill: rgba(118, 118, 128, .12);
+  --bar-bg: rgba(249, 249, 249, .94);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+}
+.phone[data-scheme="dark"] {
+  --tint: #0a84ff;
+  --destructive: #ff453a;
+  --success: #30d158;
+  --label: #ffffff;
+  --label-2: rgba(235, 235, 245, .6);
+  --label-3: rgba(235, 235, 245, .3);
+  --bg: #000000;
+  --bg-2: #1c1c1e;
+  --grouped-bg: #000000;
+  --grouped-bg-2: #1c1c1e;
+  --separator: rgba(84, 84, 88, .6);
+  --fill: rgba(118, 118, 128, .24);
+  --bar-bg: rgba(22, 22, 22, .94);
+}
+/* ── 앱 토큰 끝 ── */
+
+/* iPhone 프레임: 393×852pt (6.1" 기준). 좁은 창에서는 JS 가 통째로 축소한다 */
+.stage { flex: none; margin: 10px; }
+.phone { --dt: 1; position: relative; width: 393px; height: 852px; border-radius: 54px; overflow: hidden; background: var(--bg); color: var(--label); font-family: var(--font); box-shadow: 0 0 0 10px #1c1c1e, 0 20px 50px rgba(0,0,0,.25); transform-origin: top left; -webkit-font-smoothing: antialiased; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 3; display: flex; justify-content: space-between; align-items: center; padding: 14px 34px 0; font: 600 17px var(--font); color: var(--label); pointer-events: none; }
+.status .batt { width: 27px; height: 13px; border: 1.5px solid var(--label); border-radius: 4px; opacity: .9; position: relative; }
+.status .batt::after { content: ""; position: absolute; inset: 1.5px; right: 5px; background: var(--label); border-radius: 1.5px; }
+.home { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--label); z-index: 6; pointer-events: none; }
+.viewport { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
+.phone.has-tabs .viewport { bottom: 83px; }
+
+/* 화면 */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--bg); }
+.screen.grouped { background: var(--grouped-bg); }
+.screen > .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 34px; }
+.phone.has-tabs .screen > .content { padding-bottom: 0; }
+.navbar { flex: none; padding-top: 54px; background: var(--bar-bg); border-bottom: .5px solid var(--separator); }
+.screen.grouped .navbar, .screen[data-large-title] .navbar { background: inherit; border-bottom-color: transparent; }
+.navbar .bar { height: 44px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 8px; }
+.navbar .title { font: 600 calc(17px * var(--dt)) var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+.navbar .lead, .navbar .trail { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.navbar .trail { justify-content: flex-end; padding-right: 8px; }
+.navbar .back { color: var(--tint); font: 17px var(--font); display: flex; align-items: center; gap: 2px; background: none; border: 0; cursor: pointer; padding: 0; min-height: 44px; max-width: 150px; }
+.navbar .back span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.navbar .back::before { content: ""; width: 11px; height: 11px; border-left: 3px solid var(--tint); border-bottom: 3px solid var(--tint); transform: rotate(45deg); margin: 0 4px 0 8px; border-radius: 1px; }
+.large-title { font: 700 calc(34px * var(--dt)) / 1.2 var(--font); padding: 4px 16px 8px; letter-spacing: .01em; }
+.screen[data-large-title] .navbar .title { visibility: hidden; }
+
+/* 탭바 */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 83px; z-index: 4; display: none; background: var(--bar-bg); border-top: .5px solid var(--separator); padding-bottom: 34px; }
+.phone.has-tabs .tabbar { display: flex; }
+.tabbar button { flex: 1; border: 0; background: none; color: var(--label-2); font: 500 10px var(--font); display: grid; justify-items: center; align-content: center; gap: 1px; cursor: pointer; padding: 0; }
+.tabbar button .ic { font-size: 22px; line-height: 26px; height: 26px; }
+.tabbar button[aria-selected="true"] { color: var(--tint); }
+
+/* 모달 레이어: sheet, full, alert */
+.modal { position: absolute; inset: 0; z-index: 5; }
+.modal .dim { position: absolute; inset: 0; background: rgba(0,0,0,.4); }
+.modal .screen.sheet { top: 64px; border-radius: 12px 12px 0 0; overflow: hidden; }
+.modal .screen.sheet[data-detent="medium"] { top: 50%; }
+.modal .screen.sheet .navbar { padding-top: 6px; }
+.modal .screen.sheet .navbar::before { content: ""; display: block; width: 36px; height: 5px; border-radius: 3px; background: var(--label-3); margin: 0 auto; }
+.modal .screen.alert { inset: auto; top: 50%; left: 50%; width: 270px; transform: translate(-50%, -50%); border-radius: 14px; background: var(--bg-2); text-align: center; overflow: hidden; }
+.alert .a-body { padding: 19px 16px; display: grid; gap: 2px; }
+.alert .a-title { font: 600 calc(17px * var(--dt)) var(--font); }
+.alert .a-msg { font: calc(13px * var(--dt)) var(--font); }
+.alert .a-actions { display: flex; border-top: .5px solid var(--separator); }
+.alert .a-actions.stack { flex-direction: column; }
+.alert .a-actions button { flex: 1; min-height: 44px; border: 0; background: none; color: var(--tint); font: 17px var(--font); cursor: pointer; }
+.alert .a-actions button + button { border-left: .5px solid var(--separator); }
+.alert .a-actions.stack button + button { border-left: 0; border-top: .5px solid var(--separator); }
+.alert .a-actions button.default { font-weight: 600; }
+.alert .a-actions button.destructive { color: var(--destructive); }
+.phone.scaled-back .viewport { transform: scale(.92) translateY(10px); border-radius: 12px; transition: transform .35s ease; }
+
+/* 텍스트 스타일 (Large 크기 기준 pt). --dt 로 큰 글자 크기를 흉내 낸다 */
+.t-largeTitle { font: 700 calc(34px * var(--dt)) / 1.2 var(--font); }
+.t-title1 { font: 700 calc(28px * var(--dt)) / 1.2 var(--font); }
+.t-title2 { font: 700 calc(22px * var(--dt)) / 1.25 var(--font); }
+.t-title3 { font: 600 calc(20px * var(--dt)) / 1.25 var(--font); }
+.t-headline { font: 600 calc(17px * var(--dt)) / 1.3 var(--font); }
+.t-body { font: 400 calc(17px * var(--dt)) / 1.3 var(--font); }
+.t-callout { font: 400 calc(16px * var(--dt)) / 1.3 var(--font); }
+.t-subheadline { font: 400 calc(15px * var(--dt)) / 1.3 var(--font); }
+.t-footnote { font: 400 calc(13px * var(--dt)) / 1.3 var(--font); }
+.t-caption1 { font: 400 calc(12px * var(--dt)) / 1.3 var(--font); }
+.t-caption2 { font: 400 calc(11px * var(--dt)) / 1.3 var(--font); }
+.secondary { color: var(--label-2); }
+.pad { padding: 0 16px; }
+
+/* 리스트 (inset grouped) */
+.list { margin: 0 16px 24px; background: var(--grouped-bg-2); border-radius: 10px; overflow: hidden; }
+.screen:not(.grouped) .list.plain { margin: 0; border-radius: 0; background: var(--bg); }
+.list-header { margin: 16px 32px 6px; font: calc(13px * var(--dt)) var(--font); color: var(--label-2); text-transform: uppercase; }
+.list-footer { margin: -18px 32px 24px; font: calc(13px * var(--dt)) var(--font); color: var(--label-2); }
+.row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 11px 16px; font: calc(17px * var(--dt)) / 1.3 var(--font); position: relative; cursor: default; }
+.row[data-go], .row[data-back], .row[data-dismiss] { cursor: pointer; }
+.row[data-go]:active { background: var(--fill); }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: .5px solid var(--separator); }
+.row .main { flex: 1; min-width: 0; display: grid; }
+.row .sub { font-size: calc(15px * var(--dt)); color: var(--label-2); }
+.row .detail { color: var(--label-2); flex: none; }
+.row.chevron::after { content: ""; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--label-3); border-top: 2px solid var(--label-3); transform: rotate(45deg); margin-right: 2px; }
+.row.destructive { color: var(--destructive); }
+.row.action { color: var(--tint); }
+
+/* 컨트롤 */
+.btn { display: flex; justify-content: center; align-items: center; min-height: 50px; width: 100%; border: 0; border-radius: 12px; background: var(--tint); color: #fff; font: 600 calc(17px * var(--dt)) var(--font); cursor: pointer; padding: 0 16px; }
+.btn.tinted { background: color-mix(in srgb, var(--tint) 15%, transparent); color: var(--tint); }
+.btn.plain { background: none; color: var(--tint); font-weight: 400; min-height: 44px; }
+.btn.destructive { background: var(--destructive); }
+.btn.small { display: inline-flex; width: auto; min-height: 34px; border-radius: 17px; font-size: calc(15px * var(--dt)); }
+.bar-btn { border: 0; background: none; color: var(--tint); font: calc(17px * var(--dt)) var(--font); cursor: pointer; padding: 0; min-height: 44px; min-width: 44px; }
+.bar-btn.done { font-weight: 600; }
+.search { margin: 0 16px 10px; display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 8px; border-radius: 10px; background: var(--fill); color: var(--label-2); font: calc(17px * var(--dt)) var(--font); }
+.search::before { content: "⌕"; font-size: 18px; }
+.field { display: block; width: 100%; border: 0; background: none; color: var(--label); font: calc(17px * var(--dt)) var(--font); padding: 0; outline: none; }
+.seg { display: flex; margin: 0 16px 12px; padding: 2px; border-radius: 9px; background: var(--fill); }
+.seg button { flex: 1; min-height: 28px; border: 0; background: none; color: var(--label); font: 500 calc(13px * var(--dt)) var(--font); border-radius: 7px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--grouped-bg-2); box-shadow: 0 1px 3px rgba(0,0,0,.12); font-weight: 600; }
+.toggle { appearance: none; flex: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill); position: relative; cursor: pointer; transition: background .2s; margin: 0; }
+.toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: transform .2s; }
+.toggle:checked { background: var(--success); }
+.toggle:checked::after { transform: translateX(20px); }
+.empty { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 80px 32px; }
+.empty .ic { font-size: 44px; color: var(--label-3); }
+.empty .t { font: 700 calc(22px * var(--dt)) var(--font); }
+.empty .m { font: calc(15px * var(--dt)) var(--font); color: var(--label-2); }
+.empty .btn { width: auto; margin-top: 10px; }
+.spinner { width: 22px; height: 22px; margin: 80px auto; border-radius: 50%; border: 2.5px solid var(--fill); border-top-color: var(--label-2); animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.placeholder { background: var(--fill); border-radius: 6px; color: transparent; }
+
+/* spec 위치 표시 */
+.phone.show-spec [data-spec] { outline: 1.5px dashed #ff2d92; outline-offset: -1.5px; }
+.phone [data-spec].picked { outline: 2px solid #ff2d92 !important; outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle, .toggle::after, .phone.scaled-back .viewport { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <div class="phone" id="phone">
+      <div class="status"><span>9:41</span><span class="batt"></span></div>
+      <div class="viewport" id="viewport"></div>
+      <nav class="tabbar" id="tabbar" role="tablist"></nav>
+      <div class="modal" id="modal" hidden><div class="dim" id="dim"></div></div>
+      <div class="home"></div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="card">
+      <h2>__TITLE__</h2>
+      <div class="muted">요소를 누르면 아래에 설계서 항목이 뜬다. 설계서: <code>spec.md</code></div>
+    </div>
+    <div class="card">
+      <h2>상태</h2>
+      <div class="ctl" id="states"></div>
+    </div>
+    <div class="card">
+      <h2>보기</h2>
+      <div class="ctl">
+        <button type="button" id="scheme" aria-pressed="false">다크 모드</button>
+        <select id="dt" aria-label="글자 크기">
+          <option value="0.82">글자 xSmall</option>
+          <option value="1" selected>글자 Large (기본)</option>
+          <option value="1.35">글자 xxxLarge</option>
+          <option value="1.65">글자 AX1</option>
+          <option value="2.35">글자 AX3</option>
+          <option value="3.12">글자 AX5</option>
+        </select>
+        <label><input type="checkbox" id="rm"> 동작 줄이기</label>
+        <label><input type="checkbox" id="showspec"> spec 위치 표시</label>
+        <button type="button" id="restart">처음부터</button>
+      </div>
+    </div>
+    <div class="card note" id="note" aria-live="polite"></div>
+  </aside>
+</div>
+
+<!-- ══ 화면: 에이전트가 채우는 곳. 규약은 hig-design 의 PROTOTYPE.md ══ -->
+<div id="screens" hidden>
+__SCREENS__
+</div>
+
+<!-- ══ 설계서 항목: data-spec 마다 하나. 키는 spec.md 의 S 번호와 1:1 ══ -->
+<script type="application/json" id="notes">
+__NOTES__
+</script>
+
+<script>
+(() => {
+  const $ = (s, el = document) => el.querySelector(s);
+  const phone = $('#phone'), viewport = $('#viewport'), tabbar = $('#tabbar'), modal = $('#modal');
+  const notes = JSON.parse($('#notes').textContent || '{}');
+  const screens = {};
+  const LABELS = { name: '이름', component: '컴포넌트', purpose: '목적', entry: '진입', behavior: '동작', transition: '전환', states: '상태', a11y: '접근성', hig: 'HIG' };
+  const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = () => $('#rm').checked;
+  $('#rm').checked = reduceMQ.matches;
+
+  // 화면 준비: 내비게이션 바를 만들고 #screens 에서 꺼내 둔다
+  for (const src of [...$('#screens').children]) {
+    const id = src.dataset.screen;
+    const pres = src.dataset.presentation || 'push';
+    src.classList.add('screen');
+    if (pres === 'sheet') src.classList.add('sheet');
+    if (pres === 'alert') src.classList.add('alert');
+    if (pres !== 'alert' && !src.hasAttribute('data-no-navbar')) {
+      const content = document.createElement('div');
+      content.className = 'content';
+      const trail = src.querySelector(':scope > .trail');
+      const lead = src.querySelector(':scope > .lead');
+      while (src.firstChild) content.appendChild(src.firstChild);
+      if (trail) trail.remove();
+      if (lead) lead.remove();
+      if (src.hasAttribute('data-large-title')) content.insertAdjacentHTML('afterbegin', `<div class="large-title"></div>`);
+      const nav = document.createElement('div');
+      nav.className = 'navbar';
+      nav.innerHTML = `<div class="bar"><div class="lead"></div><div class="title"></div><div class="trail"></div></div>`;
+      $('.title', nav).textContent = src.dataset.title || '';
+      if (src.hasAttribute('data-large-title')) $('.large-title', content).textContent = src.dataset.title || '';
+      if (lead) $('.lead', nav).append(...lead.childNodes);
+      if (trail) $('.trail', nav).append(...trail.childNodes);
+      src.append(nav, content);
+    }
+    for (const r of src.querySelectorAll('.row[data-go]')) {
+      const t = $(`#screens [data-screen="${r.dataset.go}"]`) || screens[r.dataset.go];
+      if (!t || !t.dataset.presentation || t.dataset.presentation === 'push') r.classList.add('chevron');
+    }
+    screens[id] = src;
+    src.remove();
+  }
+
+  // 탭: data-tab 이 붙은 화면이 탭 루트. 없으면 첫 화면이 유일한 루트
+  const roots = Object.values(screens).filter(s => s.dataset.tab);
+  const tabs = roots.length ? roots.map(s => s.dataset.screen) : [Object.keys(screens)[0]];
+  phone.classList.toggle('has-tabs', roots.length > 0);
+  tabbar.innerHTML = roots.map(s =>
+    `<button type="button" role="tab" data-tab-go="${s.dataset.screen}"><span class="ic">${s.dataset.tabIcon || '●'}</span><span>${s.dataset.tab}</span></button>`).join('');
+
+  let stacks, tab, modals, stateOf;
+  const top = () => stacks[tab][stacks[tab].length - 1];
+
+  function anim(el, frames, opts) {
+    if (reduced()) frames = [{ opacity: 0 }, { opacity: 1 }];
+    return el.animate(frames, { duration: reduced() ? 150 : 350, easing: 'cubic-bezier(.2,.8,.2,1)', ...opts }).finished;
+  }
+
+  function mountTop() {
+    viewport.replaceChildren(screens[top()]);
+    syncBack(screens[top()], stacks[tab]);
+    for (const b of tabbar.children) b.setAttribute('aria-selected', b.dataset.tabGo === stacks[tab][0]);
+    applyState();
+  }
+
+  function syncBack(el, stack) {
+    const lead = $('.navbar .lead', el);
+    if (!lead) return;
+    lead.querySelector('.back')?.remove();
+    const i = stack.indexOf(el.dataset.screen);
+    if (i > 0) {
+      const prev = screens[stack[i - 1]];
+      lead.insertAdjacentHTML('afterbegin', `<button type="button" class="back" data-back><span></span></button>`);
+      $('.back span', lead).textContent = (prev.dataset.title || '').length > 10 ? '뒤로' : prev.dataset.title || '뒤로';
+    }
+  }
+
+  async function go(id) {
+    const t = screens[id];
+    if (!t) return console.warn('없는 화면:', id);
+    const pres = t.dataset.presentation || 'push';
+    if (pres === 'push') {
+      if (modals.length) return pushInModal(id);
+      const from = screens[top()];
+      stacks[tab].push(id);
+      viewport.append(t);
+      syncBack(t, stacks[tab]);
+      applyState();
+      await Promise.all([
+        anim(t, [{ transform: 'translateX(100%)' }, { transform: 'none' }]),
+        reduced() ? null : anim(from, [{ transform: 'none' }, { transform: 'translateX(-30%)' }]),
+      ]);
+      from.remove();
+    } else {
+      modals.push([id]);
+      modal.hidden = false;
+      modal.append(t);
+      syncBack(t, [id]);
+      phone.classList.toggle('scaled-back', pres === 'sheet' && !reduced());
+      applyState();
+      const frames = pres === 'alert' ? [{ opacity: 0, transform: 'translate(-50%,-50%) scale(1.1)' }, { opacity: 1, transform: 'translate(-50%,-50%)' }]
+        : [{ transform: 'translateY(100%)' }, { transform: 'none' }];
+      await Promise.all([anim(t, frames), anim($('#dim'), [{ opacity: 0 }, { opacity: 1 }])]);
+    }
+  }
+
+  async function pushInModal(id) {
+    const stack = modals[modals.length - 1];
+    const from = screens[stack[stack.length - 1]], t = screens[id];
+    stack.push(id);
+    t.classList.toggle('sheet', from.classList.contains('sheet'));
+    if (from.dataset.detent) t.dataset.detent = from.dataset.detent;
+    modal.append(t);
+    syncBack(t, stack);
+    applyState();
+    await anim(t, [{ transform: 'translateX(100%)' }, { transform: 'none' }]);
+    from.remove();
+  }
+
+  async function back() {
+    if (modals.length && modals[modals.length - 1].length > 1) {
+      const stack = modals[modals.length - 1];
+      const leaving = screens[stack.pop()], to = screens[stack[stack.length - 1]];
+      modal.insertBefore(to, leaving);
+      await anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }]);
+      leaving.remove();
+      applyState();
+      return;
+    }
+    if (stacks[tab].length < 2) return;
+    const leaving = screens[stacks[tab].pop()], to = screens[top()];
+    viewport.insertBefore(to, leaving);
+    syncBack(to, stacks[tab]);
+    await Promise.all([
+      anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }]),
+      reduced() ? null : anim(to, [{ transform: 'translateX(-30%)' }, { transform: 'none' }]),
+    ]);
+    leaving.remove();
+    applyState();
+  }
+
+  async function dismiss() {
+    const stack = modals.pop();
+    if (!stack) return;
+    const el = screens[stack[stack.length - 1]];
+    const alert = el.classList.contains('alert');
+    if (!modals.length) phone.classList.remove('scaled-back');
+    await Promise.all([
+      anim(el, alert ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'none' }, { transform: 'translateY(100%)' }]),
+      modals.length ? null : anim($('#dim'), [{ opacity: 1 }, { opacity: 0 }]),
+    ]);
+    el.remove();
+    if (!modals.length) modal.hidden = true;
+    applyState();
+  }
+
+  // 상태: 지금 맨 위 화면의 data-state 값들. 화면마다 따로 기억한다
+  function current() {
+    if (modals.length) { const s = modals[modals.length - 1]; return screens[s[s.length - 1]]; }
+    return screens[top()];
+  }
+  function applyState() {
+    const el = current();
+    const avail = [...new Set([...el.querySelectorAll('[data-state]')].map(n => n.dataset.state))];
+    const want = stateOf[el.dataset.screen] || 'default';
+    const st = avail.includes(want) ? want : avail.includes('default') ? 'default' : avail[0];
+    for (const n of el.querySelectorAll('[data-state]')) n.hidden = n.dataset.state !== st;
+    $('#states').innerHTML = avail.length
+      ? avail.map(s => `<button type="button" data-st="${s}" aria-pressed="${s === st}">${({ default: '기본', empty: '빈 화면', loading: '로딩', error: '오류' })[s] || s}</button>`).join('')
+      : '<span class="muted">이 화면은 상태가 하나</span>';
+    showNote(el.dataset.spec);
+  }
+
+  function showNote(id, el) {
+    phone.querySelectorAll('.picked').forEach(n => n.classList.remove('picked'));
+    if (el) el.classList.add('picked');
+    const n = notes[id];
+    const box = $('#note');
+    if (!id) { box.innerHTML = '<h2>설계서 항목</h2><div class="muted">항목 없음</div>'; return; }
+    box.innerHTML = `<h2>설계서 항목 <span class="id"></span></h2>`;
+    $('.id', box).textContent = id;
+    if (!n) { box.insertAdjacentHTML('beforeend', '<div class="muted">notes 에 이 항목이 없다</div>'); return; }
+    const dl = document.createElement('dl');
+    for (const [k, v] of Object.entries(n)) {
+      const dt = document.createElement('dt'), dd = document.createElement('dd');
+      dt.textContent = LABELS[k] || k;
+      for (const part of [].concat(v)) {
+        if (/^https?:\/\//.test(part)) { const a = document.createElement('a'); a.href = part; a.target = '_blank'; a.rel = 'noopener'; a.textContent = part.replace(/^.*guidelines\//, ''); dd.append(a, ' '); }
+        else dd.append(part, ' ');
+      }
+      dl.append(dt, dd);
+    }
+    box.append(dl);
+  }
+
+  phone.addEventListener('click', e => {
+    const specEl = e.target.closest('[data-spec]');
+    if (specEl) showNote(specEl.dataset.spec, specEl);
+    const seg = e.target.closest('.seg button');
+    if (seg) for (const b of seg.parentElement.children) b.setAttribute('aria-pressed', b === seg);
+    const a = e.target.closest('[data-go],[data-back],[data-dismiss],[data-tab-go]');
+    if (!a) return;
+    e.preventDefault();
+    if (a.dataset.tabGo) { tab = tabs.indexOf(a.dataset.tabGo); if (tab < 0) tab = 0; return mountTop(); }
+    if (a.hasAttribute('data-dismiss')) return dismiss().then(() => a.dataset.go ? go(a.dataset.go) : a.hasAttribute('data-back') && back());
+    if (a.hasAttribute('data-back')) return back();
+    go(a.dataset.go);
+  });
+  $('#states').addEventListener('click', e => {
+    const b = e.target.closest('[data-st]');
+    if (!b) return;
+    stateOf[current().dataset.screen] = b.dataset.st;
+    applyState();
+  });
+  $('#scheme').addEventListener('click', e => {
+    schemePicked = true;
+    const dark = phone.dataset.scheme !== 'dark';
+    phone.dataset.scheme = dark ? 'dark' : 'light';
+    e.currentTarget.setAttribute('aria-pressed', dark);
+  });
+  // ponytail: 큰 글자 크기를 모든 텍스트 스타일에 같은 배율로 흉내 낸다. 실제 iOS 는 스타일마다 커지는 폭이 다르다
+  $('#dt').addEventListener('change', e => phone.style.setProperty('--dt', e.target.value));
+  $('#showspec').addEventListener('change', e => phone.classList.toggle('show-spec', e.target.checked));
+  $('#restart').addEventListener('click', reset);
+
+  // 폰 화면도 처음에는 시스템 설정을 따른다. 버튼으로 바꾸면 그 뒤로는 버튼이 정한다
+  const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+  let schemePicked = false;
+  function systemScheme() {
+    if (schemePicked) return;
+    phone.dataset.scheme = darkMQ.matches ? 'dark' : 'light';
+    $('#scheme').setAttribute('aria-pressed', darkMQ.matches);
+  }
+  darkMQ.addEventListener('change', systemScheme);
+  systemScheme();
+
+  function reset() {
+    for (const s of Object.values(screens)) s.remove();
+    stacks = tabs.map(t => [t]); tab = 0; modals = []; stateOf = {};
+    modal.hidden = true; phone.classList.remove('scaled-back');
+    mountTop();
+  }
+
+  // 좁은 창에서는 프레임을 축소해 가로 스크롤이 생기지 않게 한다
+  function fit() {
+    const stage = $('#stage');
+    const s = Math.min(1, (document.documentElement.clientWidth - 32 - 20) / 393);
+    phone.style.transform = s < 1 ? `scale(${s})` : '';
+    stage.style.width = 393 * s + 'px';
+    stage.style.height = 852 * s + 'px';
+  }
+  addEventListener('resize', fit);
+  fit();
+  reset();
+})();
+</script>
+</body>
+</html>

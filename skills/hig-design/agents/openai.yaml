@@ -1,0 +1,5 @@
+interface:
+  display_name: "HIG Design"
+  short_description: "HIG 에 맞춘 iPhone 화면 설계서와 클릭 프로토타입을 만듭니다"
+policy:
+  allow_implicit_invocation: false
