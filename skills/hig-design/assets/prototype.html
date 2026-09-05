@@ -9,9 +9,11 @@
 :root {
   --page-bg: #eef0f4; --page-surface: #ffffff; --page-ink: #1b2130; --page-muted: #5d6676; --page-line: #d8dde6; --page-accent: #2f5bd3;
 }
+/* 시스템 설정을 따르되, 보는 곳(뷰어)이 data-theme 으로 테마를 정하면 그쪽을 따른다 */
 @media (prefers-color-scheme: dark) {
-  :root { --page-bg: #111318; --page-surface: #1a1d24; --page-ink: #e6e9ef; --page-muted: #9aa2b2; --page-line: #2c313c; --page-accent: #8ea8ff; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --page-bg: #111318; --page-surface: #1a1d24; --page-ink: #e6e9ef; --page-muted: #9aa2b2; --page-line: #2c313c; --page-accent: #8ea8ff; color-scheme: dark; }
 }
+:root[data-theme="dark"] { --page-bg: #111318; --page-surface: #1a1d24; --page-ink: #e6e9ef; --page-muted: #9aa2b2; --page-line: #2c313c; --page-accent: #8ea8ff; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; }
@@ -45,6 +47,9 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
   --separator: rgba(60, 60, 67, .29);
   --fill: rgba(118, 118, 128, .12);
   --bar-bg: rgba(249, 249, 249, .94);
+  --glass: rgba(255, 255, 255, .62);
+  --glass-edge: rgba(255, 255, 255, .7);
+  --glass-shadow: 0 6px 20px rgba(0, 0, 0, .12);
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
 }
 .phone[data-scheme="dark"] {
@@ -61,6 +66,9 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
   --separator: rgba(84, 84, 88, .6);
   --fill: rgba(118, 118, 128, .24);
   --bar-bg: rgba(22, 22, 22, .94);
+  --glass: rgba(44, 44, 46, .6);
+  --glass-edge: rgba(255, 255, 255, .14);
+  --glass-shadow: 0 6px 20px rgba(0, 0, 0, .45);
 }
 /* ── 앱 토큰 끝 ── */
 
@@ -75,12 +83,14 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
 .phone.has-tabs .viewport { bottom: 83px; }
 
 /* 화면 */
-.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--bg); }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--bg); isolation: isolate; }
 .screen.grouped { background: var(--grouped-bg); }
 .screen > .content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 34px; }
 .phone.has-tabs .screen > .content { padding-bottom: 0; }
 .navbar { flex: none; padding-top: 54px; background: var(--bar-bg); border-bottom: .5px solid var(--separator); }
 .screen.grouped .navbar, .screen[data-large-title] .navbar { background: inherit; border-bottom-color: transparent; }
+.screen.scrolled .navbar, .screen.grouped.scrolled .navbar, .screen[data-large-title].scrolled .navbar { background: var(--bar-bg); border-bottom-color: var(--separator); }
+.navbar { transition: background-color .2s, border-color .2s; }
 .navbar .bar { height: 44px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 8px; }
 .navbar .title { font: 600 calc(17px * var(--dt)) var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
 .navbar .lead, .navbar .trail { display: flex; gap: 14px; align-items: center; min-width: 0; }
@@ -89,7 +99,15 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
 .navbar .back span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .navbar .back::before { content: ""; width: 11px; height: 11px; border-left: 3px solid var(--tint); border-bottom: 3px solid var(--tint); transform: rotate(45deg); margin: 0 4px 0 8px; border-radius: 1px; }
 .large-title { font: 700 calc(34px * var(--dt)) / 1.2 var(--font); padding: 4px 16px 8px; letter-spacing: .01em; }
-.screen[data-large-title] .navbar .title { visibility: hidden; }
+.screen[data-large-title] .navbar .title { opacity: 0; transition: opacity .15s; }
+.screen[data-large-title].collapsed .navbar .title { opacity: 1; }
+/* 스크롤 표시줄: 브라우저 스크롤바는 숨기고 iOS 식 indicator 를 그린다.
+   트랙 없이 둥근 막대만, 스크롤하는 동안만 보이고 멈추면 사라진다. 바·탭바·홈 인디케이터를 피해 그 사이에서만 움직인다 */
+.screen > .content { scrollbar-width: none; }
+.screen > .content::-webkit-scrollbar { display: none; }
+.scroll-ind { position: absolute; right: 3px; width: 3px; border-radius: 1.5px; background: rgba(0, 0, 0, .35); opacity: 0; pointer-events: none; z-index: 3; transition: opacity .5s .3s; }
+.phone[data-scheme="dark"] .scroll-ind { background: rgba(255, 255, 255, .35); }
+.scroll-ind.on { opacity: 1; transition: opacity .1s; }
 
 /* 탭바 */
 .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 83px; z-index: 4; display: none; background: var(--bar-bg); border-top: .5px solid var(--separator); padding-bottom: 34px; }
@@ -176,6 +194,98 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
 @keyframes spin { to { transform: rotate(360deg); } }
 .placeholder { background: var(--fill); border-radius: 6px; color: transparent; }
 
+/* ── Liquid Glass (iOS 26+): 컨트롤이 콘텐츠 위에 떠 있는 유리 레이어. data-design="glass" 일 때만 ──
+   ponytail: 유리는 반투명 배경 + blur 로 흉내 낸다. 굴절·반사, 콘텐츠에 따른 밝기 적응, 탭바 최소화는 그리지 않는다 */
+.phone[data-design="glass"] .navbar, .phone[data-design="glass"] .screen .navbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; border-bottom-color: transparent; background: transparent; transition: none; }
+.phone[data-design="glass"] .navbar::after { content: ""; position: absolute; inset: -12px 0 -24px; z-index: -1; opacity: 0; pointer-events: none; transition: opacity .2s;
+  background: linear-gradient(var(--bg) 50%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  mask-image: linear-gradient(#000 60%, transparent); -webkit-mask-image: linear-gradient(#000 60%, transparent); }
+.phone[data-design="glass"] .screen.grouped .navbar::after { background: linear-gradient(var(--grouped-bg) 50%, transparent); }
+.phone[data-design="glass"] .screen.scrolled .navbar::after { opacity: 1; }
+.phone[data-design="glass"] .screen > .content { padding-top: 98px; }
+.phone[data-design="glass"] .modal .screen.sheet > .content { padding-top: 56px; }
+.phone[data-design="glass"] .navbar .lead > *, .phone[data-design="glass"] .navbar .trail > * {
+  background: var(--glass); backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: var(--glass-shadow), inset 0 0 0 .5px var(--glass-edge); border-radius: 22px; min-height: 44px; padding: 0 14px; color: var(--label); }
+.phone[data-design="glass"] .navbar .bar-btn.done { background: var(--tint); color: #fff; font-weight: 600; }
+.phone[data-design="glass"] .navbar .back { width: 44px; padding: 0; justify-content: center; }
+.phone[data-design="glass"] .navbar .back span { display: none; }
+.phone[data-design="glass"] .navbar .back::before { margin: 0 0 0 5px; border-color: var(--label); }
+.phone[data-design="glass"] .navbar .bar { padding: 0 16px; }
+.phone[data-design="glass"] .navbar .trail { padding-right: 0; }
+.phone[data-design="glass"].has-tabs .viewport { bottom: 0; }
+.phone[data-design="glass"].has-tabs .screen > .content { padding-bottom: 110px; }
+.phone[data-design="glass"] .tabbar { left: 20px; right: 20px; bottom: 26px; height: 62px; padding: 4px; border: 0; border-radius: 31px;
+  background: var(--glass); backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: var(--glass-shadow), inset 0 0 0 .5px var(--glass-edge); }
+.phone[data-design="glass"] .tabbar button { border-radius: 27px; color: var(--label); }
+.phone[data-design="glass"] .tabbar button[aria-selected="true"] { background: var(--fill); color: var(--tint); }
+.phone[data-design="glass"] .modal .screen.sheet { top: 64px; left: 0; right: 0; border-radius: 38px 38px 0 0; }
+.phone[data-design="glass"] .modal .screen.sheet[data-detent="medium"] { top: 50%; left: 8px; right: 8px; bottom: 8px; border-radius: 38px; box-shadow: var(--glass-shadow); }
+/* sheet 의 바는 위쪽 grabber 영역 때문에 맨 위에서도 배경을 둔다 */
+.phone[data-design="glass"] .modal .screen.sheet .navbar::after { opacity: 1; inset: 0 0 -16px; }
+.phone[data-design="glass"].scaled-back .viewport { transform: none; border-radius: 0; }
+.phone[data-design="glass"] .modal .screen.alert { width: 300px; border-radius: 34px; background: var(--glass); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); box-shadow: var(--glass-shadow), inset 0 0 0 .5px var(--glass-edge); }
+.phone[data-design="glass"] .alert .a-body { padding: 22px 22px 12px; text-align: left; }
+.phone[data-design="glass"] .alert .a-actions { border-top: 0; gap: 8px; padding: 8px 14px 14px; }
+.phone[data-design="glass"] .alert .a-actions button { border-radius: 22px; background: var(--fill); color: var(--label); }
+.phone[data-design="glass"] .alert .a-actions button + button { border: 0; }
+.phone[data-design="glass"] .alert .a-actions button.default { background: var(--tint); color: #fff; }
+.phone[data-design="glass"] .alert .a-actions button.destructive { color: var(--destructive); }
+.phone[data-design="glass"] .btn { border-radius: 999px; }
+.phone[data-design="glass"] .list { border-radius: 26px; }
+.phone[data-design="glass"] .search { border-radius: 999px; }
+.phone[data-design="glass"] .seg { border-radius: 999px; }
+.phone[data-design="glass"] .seg button { border-radius: 999px; }
+/* ── Liquid Glass 끝 ── */
+
+/* ── 제스처 ── */
+/* 행 스와이프 액션: .row 안의 .swipe-actions (오른쪽) / .swipe-actions.leading (왼쪽) */
+.row:has(> .swipe-actions) { touch-action: pan-y; }
+.row.snap { transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.phone.reduce-motion .row.snap { transition: none; }
+.swipe-actions { position: absolute; top: 0; bottom: 0; left: 100%; display: flex; }
+.swipe-actions.leading { left: auto; right: 100%; }
+.swipe-actions button { width: 74px; border: 0; color: #fff; background: var(--label-2); font: 600 calc(15px * var(--dt)) var(--font); cursor: pointer; }
+.swipe-actions button.destructive { background: var(--destructive); }
+.swipe-actions button.tinted { background: var(--tint); }
+.phone[data-design="glass"] .swipe-actions { gap: 6px; padding: 6px; }
+.phone[data-design="glass"] .swipe-actions button { border-radius: 999px; width: 68px; }
+/* 당겨서 새로 고침 */
+.refresh { position: absolute; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; border: 2.5px solid var(--fill); border-top-color: var(--label-2); opacity: 0; z-index: 1; pointer-events: none; }
+.refresh.spinning { animation: spin .9s linear infinite; opacity: 1; }
+/* 길게 누르기 → context menu. 메뉴 항목은 [data-menu] 요소 안의 .context-menu 에 둔다 */
+.context-menu { display: none; }
+[data-menu].pressing { transform: scale(.97); transition: transform .3s ease; }
+.ctx { position: absolute; inset: 0; z-index: 8; }
+.ctx-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.ctx-lift { position: absolute; margin: 0 !important; transform: scale(1.03); border-radius: 14px; background: var(--grouped-bg-2); box-shadow: 0 12px 40px rgba(0, 0, 0, .25); overflow: hidden; pointer-events: auto; }
+.ctx-lift .context-menu, .ctx-lift .swipe-actions { display: none; }
+.ctx-menu { position: absolute; width: 250px; border-radius: 14px; overflow: hidden; background: var(--bg-2); box-shadow: 0 12px 40px rgba(0, 0, 0, .25); display: grid; }
+.ctx-menu button { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 16px; border: 0; background: none; color: var(--label); font: calc(17px * var(--dt)) var(--font); text-align: left; cursor: pointer; }
+.ctx-menu button + button { border-top: .5px solid var(--separator); }
+.ctx-menu button.destructive { color: var(--destructive); }
+/* 항목 뒤 아이콘: <span class="mi">기호</span>. 그룹 구분: <hr> */
+.ctx-menu button .mi { flex: none; width: 24px; margin-left: 12px; text-align: center; font-size: calc(17px * var(--dt)); }
+.ctx-menu hr { margin: 0; border: 0; height: 8px; background: var(--fill); }
+.phone[data-design="glass"] .ctx-menu { border-radius: 26px; background: var(--glass); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); padding: 6px 0; }
+.phone[data-design="glass"] .ctx-menu button + button { border-top: 0; }
+.phone[data-design="glass"] .ctx-menu hr { height: .5px; margin: 6px 16px; background: var(--separator); }
+/* pull-down 메뉴: 배경을 흐리지 않고, 누른 버튼에 붙어 열린다 */
+.ctx.pull .ctx-dim { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* action sheet: 아래에서 올라오는 선택지 묶음 + 따로 떨어진 취소 */
+.modal .screen.action-sheet { inset: auto 8px 42px 8px; background: transparent; display: flex; flex-direction: column; gap: 8px; }
+.as-group { display: grid; border-radius: 14px; overflow: hidden; background: var(--bg-2); }
+.as-title { padding: 14px 16px; text-align: center; color: var(--label-2); font: calc(13px * var(--dt)) / 1.35 var(--font); border-bottom: .5px solid var(--separator); }
+.as-title b { display: block; font-weight: 600; }
+.action-sheet button { min-height: 57px; border: 0; background: none; color: var(--tint); font: calc(20px * var(--dt)) var(--font); cursor: pointer; }
+.as-group button + button { border-top: .5px solid var(--separator); }
+.action-sheet button.destructive { color: var(--destructive); }
+.action-sheet .as-cancel { border-radius: 14px; background: var(--grouped-bg-2); font-weight: 600; }
+.phone[data-design="glass"] .as-group, .phone[data-design="glass"] .action-sheet .as-cancel { border-radius: 28px; background: var(--glass); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); box-shadow: var(--glass-shadow); }
+.phone[data-design="glass"] .action-sheet button { font-size: calc(17px * var(--dt)); min-height: 52px; }
+
 /* spec 위치 표시 */
 .phone.show-spec [data-spec] { outline: 1.5px dashed #ff2d92; outline-offset: -1.5px; }
 .phone [data-spec].picked { outline: 2px solid #ff2d92 !important; outline-offset: -2px; }
@@ -188,7 +298,7 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
 <body>
 <div class="page">
   <div class="stage" id="stage">
-    <div class="phone" id="phone">
+    <div class="phone" id="phone" data-designs="__DESIGNS__">
       <div class="status"><span>9:41</span><span class="batt"></span></div>
       <div class="viewport" id="viewport"></div>
       <nav class="tabbar" id="tabbar" role="tablist"></nav>
@@ -200,11 +310,15 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
   <aside class="side">
     <div class="card">
       <h2>__TITLE__</h2>
-      <div class="muted">요소를 누르면 아래에 설계서 항목이 뜬다. 설계서: <code>spec.md</code></div>
+      <div class="muted">요소를 누르면 아래에 설계서 항목이 뜬다. 설계서: <code id="spec-file"></code></div>
     </div>
     <div class="card">
       <h2>상태</h2>
       <div class="ctl" id="states"></div>
+    </div>
+    <div class="card" id="design-card">
+      <h2>디자인</h2>
+      <div class="ctl" id="designs"></div>
     </div>
     <div class="card">
       <h2>보기</h2>
@@ -222,6 +336,10 @@ body { margin: 0; background: var(--page-bg); color: var(--page-ink); font: 14px
         <label><input type="checkbox" id="showspec"> spec 위치 표시</label>
         <button type="button" id="restart">처음부터</button>
       </div>
+    </div>
+    <div class="card">
+      <h2>제스처 (마우스)</h2>
+      <div class="muted">왼쪽 가장자리에서 오른쪽으로 끌기: 뒤로 · sheet 를 아래로 끌기: 닫기 · 맨 위에서 아래로 당기기: 새로 고침 (지원 화면) · 행을 옆으로 밀기: 스와이프 액션 · 길게 누르기 또는 오른쪽 클릭: context menu · 위아래로 끌기·휠: 스크롤</div>
     </div>
     <div class="card note" id="note" aria-live="polite"></div>
   </aside>
@@ -247,6 +365,10 @@ __NOTES__
   const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
   const reduced = () => $('#rm').checked;
   $('#rm').checked = reduceMQ.matches;
+  // 화면별 스타일·스크립트가 동작 줄이기를 알 수 있게 phone 에 클래스로 표시한다
+  const syncRM = () => phone.classList.toggle('reduce-motion', reduced());
+  $('#rm').addEventListener('change', syncRM);
+  syncRM();
 
   // 화면 준비: 내비게이션 바를 만들고 #screens 에서 꺼내 둔다
   for (const src of [...$('#screens').children]) {
@@ -255,7 +377,8 @@ __NOTES__
     src.classList.add('screen');
     if (pres === 'sheet') src.classList.add('sheet');
     if (pres === 'alert') src.classList.add('alert');
-    if (pres !== 'alert' && !src.hasAttribute('data-no-navbar')) {
+    if (pres === 'action-sheet') src.classList.add('action-sheet');
+    if (pres !== 'alert' && pres !== 'action-sheet' && !src.hasAttribute('data-no-navbar')) {
       const content = document.createElement('div');
       content.className = 'content';
       const trail = src.querySelector(':scope > .trail');
@@ -272,6 +395,28 @@ __NOTES__
       if (lead) $('.lead', nav).append(...lead.childNodes);
       if (trail) $('.trail', nav).append(...trail.childNodes);
       src.append(nav, content);
+      // 스크롤: 내용이 바 밑으로 들어가면 scrolled (바 배경·scroll edge effect), 큰 제목이 다 가려지면 collapsed (바에 작은 제목)
+      const ind = document.createElement('div');
+      ind.className = 'scroll-ind';
+      src.append(ind);
+      if (src.hasAttribute('data-refreshable')) src.insertAdjacentHTML('beforeend', '<div class="refresh"></div>');
+      let indTimer;
+      content.addEventListener('scroll', () => {
+        // indicator: 바 아래 ~ 아래쪽 여백(홈 인디케이터·탭바) 위 사이를 트랙으로 쓴다
+        const top = nav.offsetHeight + 3;
+        const trackH = content.offsetTop + content.clientHeight - parseFloat(getComputedStyle(content).paddingBottom) - 3 - top;
+        const ratio = content.clientHeight / content.scrollHeight;
+        const h = Math.max(36, trackH * ratio);
+        const pos = content.scrollTop / Math.max(1, content.scrollHeight - content.clientHeight);
+        ind.style.top = top + (trackH - h) * Math.min(1, Math.max(0, pos)) + 'px';
+        ind.style.height = h + 'px';
+        ind.classList.add('on');
+        clearTimeout(indTimer);
+        indTimer = setTimeout(() => ind.classList.remove('on'), 400);
+        src.classList.toggle('scrolled', content.scrollTop > 0);
+        const lt = $('.large-title', content);
+        src.classList.toggle('collapsed', !!lt && content.scrollTop > lt.offsetTop + lt.offsetHeight - nav.offsetHeight);
+      }, { passive: true });
     }
     for (const r of src.querySelectorAll('.row[data-go]')) {
       const t = $(`#screens [data-screen="${r.dataset.go}"]`) || screens[r.dataset.go];
@@ -292,8 +437,9 @@ __NOTES__
   const top = () => stacks[tab][stacks[tab].length - 1];
 
   function anim(el, frames, opts) {
-    if (reduced()) frames = [{ opacity: 0 }, { opacity: 1 }];
-    return el.animate(frames, { duration: reduced() ? 150 : 350, easing: 'cubic-bezier(.2,.8,.2,1)', ...opts }).finished;
+    // 동작 줄이기: 움직임 대신 cross-fade. 사라지는 쪽(opts.out)은 fade-out
+    if (reduced()) frames = opts && opts.out ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: 1 }];
+    return el.animate(frames, { easing: 'cubic-bezier(.2,.8,.2,1)', ...opts, duration: reduced() ? 150 : (opts && opts.duration) || 350 }).finished;
   }
 
   function mountTop() {
@@ -315,18 +461,35 @@ __NOTES__
     }
   }
 
-  async function go(id) {
+  // zoom 전환: 누른 요소(카드·썸네일)의 자리에서 새 화면이 펼쳐지고, 뒤로 가면 그 자리로 접힌다
+  // ponytail: 원본 요소 모양으로 잘라낸(clip-path) 화면을 펼쳐 흉내 낸다. 실제 iOS 는 원본 내용이 새 화면으로 이어지듯 변형된다
+  const zoomSrc = {};
+  function clipOf(el) {
+    const s = phone.getBoundingClientRect().width / 393;
+    const v = viewport.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const t = (r.top - v.top) / s, l = (r.left - v.left) / s, b = (v.bottom - r.bottom) / s, ri = (v.right - r.right) / s;
+    return `inset(${t}px ${ri}px ${b}px ${l}px round 16px)`;
+  }
+  const ZOOM_OPEN = 'inset(0px 0px 0px 0px round 0px)';
+
+  async function go(id, src) {
     const t = screens[id];
     if (!t) return console.warn('없는 화면:', id);
     const pres = t.dataset.presentation || 'push';
     if (pres === 'push') {
       if (modals.length) return pushInModal(id);
       const from = screens[top()];
+      const zoom = src && src.dataset.transition === 'zoom';
+      const clip = zoom && clipOf(src);
+      zoomSrc[id] = zoom ? src : null;
       stacks[tab].push(id);
       viewport.append(t);
       syncBack(t, stacks[tab]);
       applyState();
-      await Promise.all([
+      await Promise.all(zoom ? [
+        anim(t, [{ clipPath: clip, transform: 'scale(.96)' }, { clipPath: ZOOM_OPEN, transform: 'none' }], { duration: 450 }),
+        reduced() ? null : anim(from, [{ transform: 'none', filter: 'none' }, { transform: 'scale(.94)', filter: 'brightness(.7)' }], { duration: 450 }),
+      ] : [
         anim(t, [{ transform: 'translateX(100%)' }, { transform: 'none' }]),
         reduced() ? null : anim(from, [{ transform: 'none' }, { transform: 'translateX(-30%)' }]),
       ]);
@@ -362,33 +525,46 @@ __NOTES__
       const stack = modals[modals.length - 1];
       const leaving = screens[stack.pop()], to = screens[stack[stack.length - 1]];
       modal.insertBefore(to, leaving);
-      await anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }]);
+      await anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }], { out: true });
       leaving.remove();
       applyState();
       return;
     }
     if (stacks[tab].length < 2) return;
-    const leaving = screens[stacks[tab].pop()], to = screens[top()];
+    const leavingId = stacks[tab].pop();
+    const leaving = screens[leavingId], to = screens[top()];
     viewport.insertBefore(to, leaving);
     syncBack(to, stacks[tab]);
+    const src = zoomSrc[leavingId];
+    if (src && to.contains(src)) {
+      await Promise.all([
+        anim(leaving, [{ clipPath: ZOOM_OPEN, transform: 'none' }, { clipPath: clipOf(src), transform: 'scale(.96)' }], { duration: 400, out: true }),
+        reduced() ? null : anim(to, [{ transform: 'scale(.94)', filter: 'brightness(.7)' }, { transform: 'none', filter: 'none' }], { duration: 400 }),
+      ]);
+      leaving.remove();
+      applyState();
+      return;
+    }
     await Promise.all([
-      anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }]),
+      anim(leaving, [{ transform: 'none' }, { transform: 'translateX(100%)' }], { out: true }),
       reduced() ? null : anim(to, [{ transform: 'translateX(-30%)' }, { transform: 'none' }]),
     ]);
     leaving.remove();
     applyState();
   }
 
-  async function dismiss() {
+  async function dismiss(fromY = 0) {
     const stack = modals.pop();
     if (!stack) return;
     const el = screens[stack[stack.length - 1]];
     const alert = el.classList.contains('alert');
     if (!modals.length) phone.classList.remove('scaled-back');
     await Promise.all([
-      anim(el, alert ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'none' }, { transform: 'translateY(100%)' }]),
-      modals.length ? null : anim($('#dim'), [{ opacity: 1 }, { opacity: 0 }]),
+      anim(el, alert ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: `translateY(${fromY}px)` }, { transform: 'translateY(100%)' }], { out: true }),
+      modals.length ? null : anim($('#dim'), [{ opacity: getComputedStyle($('#dim')).opacity }, { opacity: 0 }], { out: true }),
     ]);
+    el.style.transform = '';
+    $('#dim').style.opacity = '';
     el.remove();
     if (!modals.length) modal.hidden = true;
     applyState();
@@ -414,7 +590,9 @@ __NOTES__
   function showNote(id, el) {
     phone.querySelectorAll('.picked').forEach(n => n.classList.remove('picked'));
     if (el) el.classList.add('picked');
-    const n = notes[id];
+    const base = notes[id];
+    // 디자인별로 다른 내용은 notes 항목 안의 "glass" / "classic" 객체가 덮어쓴다
+    const n = base && Object.fromEntries(Object.entries({ ...base, ...(base[phone.dataset.design] || {}) }).filter(([k]) => !DESIGNS[k]));
     const box = $('#note');
     if (!id) { box.innerHTML = '<h2>설계서 항목</h2><div class="muted">항목 없음</div>'; return; }
     box.innerHTML = `<h2>설계서 항목 <span class="id"></span></h2>`;
@@ -433,18 +611,253 @@ __NOTES__
     box.append(dl);
   }
 
+  // ── 제스처 ──
+  // iOS 표준 제스처를 마우스로도 쓸 수 있게 한다: 왼쪽 가장자리에서 끌어 뒤로, sheet 를 끌어내려 닫기, 당겨서 새로 고침,
+  // 행 스와이프 액션, 길게 누르기(마우스는 오른쪽 클릭도) → context menu, 위아래로 끌어 스크롤.
+  // 처음 6pt 움직인 방향으로 어떤 제스처인지 정하고, 제스처가 일어났으면 손을 뗄 때의 클릭은 무시한다.
+  // ponytail: 판정은 끈 거리로만 한다 (빠르게 튕기는 속도는 보지 않음). 관성 스크롤·고무줄 효과는 없다.
+  //   터치 기기에서는 브라우저가 세로 끌기를 스크롤로 가져가므로 sheet 끌어내리기·당겨서 새로 고침이 안 될 수 있다
+  const ctx = document.createElement('div');
+  ctx.className = 'ctx';
+  ctx.hidden = true;
+  phone.append(ctx);
+  let g = null, swallow = false, openRow = null, lpTimer = null, menuSrc = null;
+  const local = e => { const r = phone.getBoundingClientRect(), k = r.width / 393; return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k }; };
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  // 손을 뗀 뒤 제자리로 가거나 끝까지 가는 움직임. 동작 줄이기면 바로 끝 상태로
+  const settle = (el, frames, opts) => reduced() ? Promise.resolve() : el.animate(frames, { duration: 250, easing: 'cubic-bezier(.2,.8,.2,1)', ...opts }).finished;
+  const rowX = row => parseFloat((row.style.transform.match(/translateX\((-?[\d.]+)px\)/) || [])[1]) || 0;
+  const slideRow = (row, x, snap) => { row.classList.toggle('snap', !!snap); row.style.transform = x ? `translateX(${x}px)` : ''; };
+  const cancelLP = () => { clearTimeout(lpTimer); lpTimer = null; phone.querySelectorAll('.pressing').forEach(n => n.classList.remove('pressing')); };
+
+  phone.addEventListener('pointerdown', e => {
+    swallow = false;
+    if (e.button !== 0 || e.target.closest('.ctx')) return;
+    const row = e.target.closest('.row');
+    if (openRow && openRow !== row) { slideRow(openRow, 0, true); openRow = null; }
+    if (e.target.closest('input, select, textarea, .swipe-actions')) return;
+    const screen = e.target.closest('.screen');
+    g = { p0: local(e), type: e.pointerType, screen, content: e.target.closest('.screen > .content'), mode: null,
+          row: row && row.querySelector(':scope > .swipe-actions') ? row : null };
+    if (g.content) g.top0 = g.content.scrollTop;
+    if (g.row) g.x0 = rowX(g.row);
+    const menuEl = e.target.closest('[data-menu]');
+    if (menuEl) {
+      menuEl.classList.add('pressing');
+      lpTimer = setTimeout(() => { cancelLP(); g = null; swallow = true; openMenu(menuEl); }, 500);
+    }
+  });
+
+  function pickMode(dx, dy) {
+    const inModal = g.screen && modal.contains(g.screen);
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0 && g.p0.x < 24 && !inModal && stacks[tab].length > 1) return 'back';
+      return g.row ? 'row' : null;
+    }
+    if (dy > 0 && inModal && g.screen.classList.contains('sheet') && (!g.content || g.content.scrollTop <= 0)) return 'sheet';
+    if (dy > 0 && g.screen && g.screen.hasAttribute('data-refreshable') && g.content && g.content.scrollTop <= 0) return 'refresh';
+    return g.type === 'mouse' && g.content ? 'scroll' : null;
+  }
+
+  addEventListener('pointermove', e => {
+    if (!g) return;
+    const p = local(e), dx = p.x - g.p0.x, dy = p.y - g.p0.y;
+    if (!g.mode) {
+      if (Math.hypot(dx, dy) < 6) return;
+      cancelLP();
+      g.mode = pickMode(dx, dy);
+      if (!g.mode) { g = null; return; }
+      if (g.mode === 'back') {
+        g.from = screens[top()];
+        g.to = screens[stacks[tab][stacks[tab].length - 2]];
+        viewport.insertBefore(g.to, g.from);
+        syncBack(g.to, stacks[tab]);
+      }
+      if (g.mode === 'sheet') g.sheet = current();
+      if (g.mode === 'refresh') g.spin = $('.refresh', g.screen);
+    }
+    if (g.mode === 'scroll') g.content.scrollTop = g.top0 - dy;
+    if (g.mode === 'row') {
+      const lead = $(':scope > .swipe-actions.leading', g.row), trail = $(':scope > .swipe-actions:not(.leading)', g.row);
+      slideRow(g.row, clamp(g.x0 + dx, trail ? -trail.offsetWidth : 0, lead ? lead.offsetWidth : 0));
+    }
+    if (g.mode === 'back') {
+      g.t = clamp(dx / 393, 0, 1);
+      g.from.style.transform = `translateX(${g.t * 393}px)`;
+      g.to.style.transform = reduced() ? '' : `translateX(${-30 * (1 - g.t)}%)`;
+    }
+    if (g.mode === 'sheet') {
+      g.y = Math.max(0, dy);
+      g.sheet.style.transform = `translateY(${g.y}px)`;
+      $('#dim').style.opacity = String(1 - Math.min(1, g.y / g.sheet.offsetHeight));
+    }
+    if (g.mode === 'refresh') {
+      g.y = Math.min(dy * .5, 90);
+      g.content.style.transform = `translateY(${g.y}px)`;
+      g.spin.style.top = $('.navbar', g.screen).offsetHeight + 12 + 'px';
+      g.spin.style.opacity = String(Math.min(1, g.y / 60));
+      g.spin.style.transform = `rotate(${g.y * 4}deg)`;
+    }
+  });
+
+  async function endGesture() {
+    const m = g;
+    g = null;
+    swallow = true;
+    if (m.mode === 'row') {
+      const x = rowX(m.row);
+      const lead = $(':scope > .swipe-actions.leading', m.row), trail = $(':scope > .swipe-actions:not(.leading)', m.row);
+      const to = trail && x < -trail.offsetWidth / 2 ? -trail.offsetWidth : lead && x > lead.offsetWidth / 2 ? lead.offsetWidth : 0;
+      slideRow(m.row, to, true);
+      openRow = to ? m.row : null;
+    }
+    if (m.mode === 'back') {
+      const done = m.t > .35;
+      if (done) stacks[tab].pop();
+      await Promise.all([
+        settle(m.from, [{ transform: `translateX(${m.t * 393}px)` }, { transform: done ? 'translateX(100%)' : 'none' }]),
+        settle(m.to, [{ transform: `translateX(${-30 * (1 - m.t)}%)` }, { transform: done ? 'none' : 'translateX(-30%)' }]),
+      ]);
+      m.from.style.transform = m.to.style.transform = '';
+      (done ? m.from : m.to).remove();
+      if (!done) syncBack(m.from, stacks[tab]);
+      applyState();
+    }
+    if (m.mode === 'sheet') {
+      if (m.y > m.sheet.offsetHeight * .25) {
+        // 입력을 잃을 수 있는 sheet 는 닫지 않고 확인 alert 를 띄운다 (HIG: 닫으면 입력이 사라질 때는 확인)
+        const confirmId = m.sheet.dataset.confirmDismiss;
+        if (confirmId) {
+          await settle(m.sheet, [{ transform: `translateY(${m.y}px)` }, { transform: 'none' }]);
+          m.sheet.style.transform = ''; $('#dim').style.opacity = '';
+          go(confirmId);
+        } else dismiss(m.y);
+      } else {
+        await settle(m.sheet, [{ transform: `translateY(${m.y}px)` }, { transform: 'none' }]);
+        m.sheet.style.transform = ''; $('#dim').style.opacity = '';
+      }
+    }
+    if (m.mode === 'refresh') {
+      if (m.y >= 60) {
+        // 화면 전용 스크립트는 화면의 'refresh' 이벤트를 받아 내용을 바꿀 수 있다
+        m.spin.style.transform = ''; m.spin.classList.add('spinning');
+        await settle(m.content, [{ transform: `translateY(${m.y}px)` }, { transform: 'translateY(50px)' }]);
+        m.content.style.transform = 'translateY(50px)';
+        m.screen.dispatchEvent(new CustomEvent('refresh'));
+        await new Promise(r => setTimeout(r, 1000));
+        m.spin.classList.remove('spinning');
+        m.spin.style.opacity = '0';
+        await settle(m.content, [{ transform: 'translateY(50px)' }, { transform: 'none' }]);
+      } else {
+        m.spin.style.opacity = '0';
+        await settle(m.content, [{ transform: `translateY(${m.y}px)` }, { transform: 'none' }]);
+      }
+      m.content.style.transform = '';
+    }
+  }
+  const up = () => { cancelLP(); if (g && g.mode) endGesture(); else g = null; };
+  addEventListener('pointerup', up);
+  addEventListener('pointercancel', up);
+
+  // context menu: 누른 요소를 띄워 보여 주고 그 옆에 메뉴를 연다. 배경을 누르거나 항목을 고르면 닫힌다
+  // 메뉴 열기. context menu: 누른 요소를 띄우고 배경을 흐리게 한 뒤 그 옆에 메뉴.
+  // pull-down: 배경은 그대로 두고 누른 버튼에 붙여 메뉴만 연다 (버튼이 화면 오른쪽 반이면 오른쪽 끝을 맞춘다)
+  function openMenu(el, pull) {
+    // 메뉴 항목: 자기 안의 .context-menu. pull-down 버튼은 버튼 안에 버튼을 넣을 수 없으므로
+    // data-pulldown="<id>" 로 같은 화면의 항목 묶음을 가리키거나, 값 없이 두면 감싼 [data-menu] 요소의 메뉴를 같이 쓴다
+    const host = pull ? el.closest('[data-menu]') : null;
+    const items = $(':scope > .context-menu', el)
+      || (pull && el.dataset.pulldown && el.closest('.screen, .ctx')?.querySelector('#' + CSS.escape(el.dataset.pulldown)))
+      || (host && $(':scope > .context-menu', host));
+    if (!items) return;
+    // data-remove 대상: context menu 는 누른 요소, pull-down 은 버튼을 감싼 [data-menu] 요소나 행
+    menuSrc = pull ? el.closest('[data-menu], .row') || el : el;
+    const k = phone.getBoundingClientRect().width / 393, pr = phone.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const box = { x: (r.left - pr.left) / k, y: (r.top - pr.top) / k, w: r.width / k, h: r.height / k };
+    ctx.className = 'ctx' + (pull ? ' pull' : '');
+    ctx.innerHTML = '<div class="ctx-dim"></div>';
+    const menu = document.createElement('div');
+    menu.className = 'ctx-menu';
+    menu.append(...[...items.children].map(n => n.cloneNode(true)));
+    ctx.append(menu);
+    ctx.hidden = false;
+    const mh = menu.offsetHeight, mw = menu.offsetWidth, TOP = 60, BOTTOM = 852 - 40, GAP = pull ? 8 : 12;
+    if (pull) {
+      const right = box.x + box.w / 2 > 393 / 2;
+      const below = box.y + box.h + GAP + mh <= BOTTOM;
+      menu.style.left = clamp(right ? box.x + box.w - mw : box.x, 16, 393 - 16 - mw) + 'px';
+      menu.style.top = (below ? box.y + box.h + GAP : Math.max(TOP, box.y - GAP - mh)) + 'px';
+      menu.style.transformOrigin = `${right ? 'right' : 'left'} ${below ? 'top' : 'bottom'}`;
+    } else {
+      // 띄운 요소와 메뉴가 겹치지 않게: 아래 → 위 → 둘 다 안 되면 띄운 요소를 줄여 위쪽에 두고 메뉴는 그 아래
+      let sc = 1.03, ly = box.y, my;
+      if (box.y + box.h + GAP + mh <= BOTTOM) my = box.y + box.h + GAP;
+      else if (box.y - GAP - mh >= TOP) my = box.y - GAP - mh;
+      else {
+        sc = Math.min(1, (BOTTOM - TOP - GAP - mh) / box.h);
+        ly = TOP;
+        my = TOP + box.h * sc + GAP;
+      }
+      const lift = el.cloneNode(true);
+      lift.classList.remove('pressing');
+      lift.classList.add('ctx-lift');
+      lift.removeAttribute('data-menu');
+      const lx = sc < 1 ? (393 - box.w * sc) / 2 : box.x;
+      lift.style.cssText += `;left:${lx}px;top:${ly}px;width:${box.w}px;height:${box.h}px;transform-origin:top left;transform:scale(${sc})`;
+      ctx.insertBefore(lift, menu);
+      menu.style.left = clamp(box.x, 16, 393 - 16 - mw) + 'px';
+      menu.style.top = my + 'px';
+    }
+    anim(menu, [{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'none' }], { duration: 250 });
+    anim($('.ctx-dim', ctx), [{ opacity: 0 }, { opacity: 1 }], { duration: 250 });
+  }
+  function closeMenu() { ctx.hidden = true; ctx.innerHTML = ''; menuSrc = null; }
+  phone.addEventListener('contextmenu', e => {
+    const el = e.target.closest('[data-menu]');
+    if (!el || e.target.closest('.ctx')) return;
+    e.preventDefault();
+    cancelLP(); g = null;
+    openMenu(el);
+  });
+
+  // 제스처 뒤의 클릭 무시, 스와이프·메뉴 항목의 data-remove 처리
+  phone.addEventListener('click', e => {
+    if (swallow) { swallow = false; e.stopPropagation(); e.preventDefault(); return; }
+    const pd = !e.target.closest('.ctx') && e.target.closest('[data-pulldown]');
+    if (pd) { e.stopPropagation(); e.preventDefault(); openMenu(pd, true); return; }
+    if (e.target.id === 'dim' && current() && current().classList.contains('action-sheet')) { e.stopPropagation(); dismiss(); return; }
+    const act = e.target.closest('.swipe-actions button, .ctx-menu button');
+    if (act && act.hasAttribute('data-remove')) {
+      const target = act.closest('.ctx') ? menuSrc : act.closest('.row');
+      target?.remove();
+    }
+    if (act && act.closest('.swipe-actions')) { slideRow(act.closest('.row'), 0, true); openRow = null; }
+    // 액션 버튼 자체에 이동 속성이 없으면, 버튼을 감싼 행의 data-go 로 이동하지 않게 여기서 멈춘다
+    if (act && !act.matches('[data-go],[data-back],[data-dismiss]')) e.stopPropagation();
+    // 메뉴가 열려 있을 때의 클릭(배경, 띄운 요소, 항목)은 모두 메뉴를 닫는다. 띄운 요소·항목의 data-go 이동은 그대로 일어난다
+    if (e.target.closest('.ctx')) setTimeout(closeMenu);
+  }, true);
+
   phone.addEventListener('click', e => {
     const specEl = e.target.closest('[data-spec]');
     if (specEl) showNote(specEl.dataset.spec, specEl);
     const seg = e.target.closest('.seg button');
     if (seg) for (const b of seg.parentElement.children) b.setAttribute('aria-pressed', b === seg);
+    // 행 안의 입력 컨트롤(체크, 스위치, 텍스트 필드)을 누르면 행의 이동은 일어나지 않는다
+    if (e.target.closest('input, select, textarea')) return;
     const a = e.target.closest('[data-go],[data-back],[data-dismiss],[data-tab-go]');
     if (!a) return;
     e.preventDefault();
     if (a.dataset.tabGo) { tab = tabs.indexOf(a.dataset.tabGo); if (tab < 0) tab = 0; return mountTop(); }
-    if (a.hasAttribute('data-dismiss')) return dismiss().then(() => a.dataset.go ? go(a.dataset.go) : a.hasAttribute('data-back') && back());
+    if (a.hasAttribute('data-dismiss')) {
+      // data-dismiss="2": 모달 두 겹(예: 확인 alert 와 그 아래 sheet)을 함께 닫는다
+      return (async () => {
+        for (let i = 0; i < (+a.dataset.dismiss || 1); i++) await dismiss();
+        if (a.dataset.go) go(a.dataset.go); else if (a.hasAttribute('data-back')) back();
+      })();
+    }
     if (a.hasAttribute('data-back')) return back();
-    go(a.dataset.go);
+    go(a.dataset.go, a);
   });
   $('#states').addEventListener('click', e => {
     const b = e.target.closest('[data-st]');
@@ -463,15 +876,30 @@ __NOTES__
   $('#showspec').addEventListener('change', e => phone.classList.toggle('show-spec', e.target.checked));
   $('#restart').addEventListener('click', reset);
 
+  // 디자인: data-designs 의 첫 값이 기본. 하나뿐이면 전환 카드를 숨긴다
+  const DESIGNS = { glass: ['Liquid Glass', 'spec-liquid-glass.md'], classic: ['이전 디자인', 'spec-classic.md'] };
+  const designs = phone.dataset.designs.split(/\s+/).filter(d => DESIGNS[d]);
+  function setDesign(d) {
+    phone.dataset.design = d;
+    $('#spec-file').textContent = DESIGNS[d][1];
+    $('#designs').innerHTML = designs.map(x => `<button type="button" data-design="${x}" aria-pressed="${x === d}">${DESIGNS[x][0]}</button>`).join('');
+    if (stacks) applyState();
+  }
+  $('#design-card').hidden = designs.length < 2;
+  $('#designs').addEventListener('click', e => { const b = e.target.closest('[data-design]'); if (b) setDesign(b.dataset.design); });
+
   // 폰 화면도 처음에는 시스템 설정을 따른다. 버튼으로 바꾸면 그 뒤로는 버튼이 정한다
   const darkMQ = matchMedia('(prefers-color-scheme: dark)');
   let schemePicked = false;
   function systemScheme() {
     if (schemePicked) return;
-    phone.dataset.scheme = darkMQ.matches ? 'dark' : 'light';
-    $('#scheme').setAttribute('aria-pressed', darkMQ.matches);
+    const t = document.documentElement.dataset.theme;
+    const dark = t ? t === 'dark' : darkMQ.matches;
+    phone.dataset.scheme = dark ? 'dark' : 'light';
+    $('#scheme').setAttribute('aria-pressed', dark);
   }
   darkMQ.addEventListener('change', systemScheme);
+  new MutationObserver(systemScheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   systemScheme();
 
   function reset() {
@@ -481,16 +909,20 @@ __NOTES__
     mountTop();
   }
 
-  // 좁은 창에서는 프레임을 축소해 가로 스크롤이 생기지 않게 한다
+  // 창이 작으면 프레임을 축소해 폰 전체가 한 화면에 들어오게 한다 (폭: 좌우 여백 16 + 프레임 테두리, 높이: 페이지 위아래 여백 24 + 프레임 바깥 여백 10 + 테두리 10)
   function fit() {
     const stage = $('#stage');
-    const s = Math.min(1, (document.documentElement.clientWidth - 32 - 20) / 393);
+    const w = (document.documentElement.clientWidth - 32 - 40) / 393;
+    const h = (innerHeight - 48 - 40) / 852;
+    const s = Math.max(.4, Math.min(1, w, h));
     phone.style.transform = s < 1 ? `scale(${s})` : '';
     stage.style.width = 393 * s + 'px';
     stage.style.height = 852 * s + 'px';
   }
   addEventListener('resize', fit);
   fit();
+
+  setDesign(designs[0] || 'glass');
   reset();
 })();
 </script>

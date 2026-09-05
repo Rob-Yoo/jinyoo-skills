@@ -120,6 +120,8 @@ https://developer.apple.com/design/human-interface-guidelines/tab-bars · https:
 - **중요한 항목을 위에 두고 관련 항목끼리 묶는다.**
 - **하위 메뉴는 1단계까지만, 항목이 5개 정도를 넘으면 메뉴를 분리한다.**
 - **아이콘은 그룹 단위로 전부 달거나 전부 뺀다.**
+- **⋯ More 버튼은 Pull-down button 이다.** 누르면 버튼에 붙어 메뉴가 바로 열린다. 배경을 흐리거나 요소를 띄우는 것은 길게 누르기로 여는 Context menu 의 모습이다. More 버튼은 공간이 좁을 때 덜 중요한 항목을 모으는 데 쓰고, 화면의 주요 동작을 그 안에 숨기지 않는다.
+- **Pull-down 메뉴는 항목이 3개 이상일 때 쓴다.** 1~2개면 버튼으로 바로 둔다. 위험한 항목은 빨간 글씨로 표시하고, 고르면 확인을 받는다 (Action sheet).
 - **iPhone에서는 small/medium 레이아웃을 쓸 수 있다.** small은 상단 4개를 아이콘만으로, medium은 상단 3개를 아이콘+짧은 라벨로 보여 준다. 핵심 액션 3개는 medium으로, Bold·Italic처럼 묶인 동작은 small로.
 
 ### Segmented control
@@ -156,7 +158,7 @@ https://developer.apple.com/design/human-interface-guidelines/tab-bars · https:
 - **페이지 단위 스크롤에는 page control을 쓰고, 스크롤 인디케이터는 함께 보이지 않게 한다.**
 - **scroll edge effect는 떠 있는 컨트롤 뒤에서만, 뷰당 하나만 쓴다.**
 
-https://developer.apple.com/design/human-interface-guidelines/toolbars · https://developer.apple.com/design/human-interface-guidelines/tab-bars · https://developer.apple.com/design/human-interface-guidelines/sheets · https://developer.apple.com/design/human-interface-guidelines/lists-and-tables · https://developer.apple.com/design/human-interface-guidelines/gestures · https://developer.apple.com/design/human-interface-guidelines/search-fields · https://developer.apple.com/design/human-interface-guidelines/searching · https://developer.apple.com/design/human-interface-guidelines/buttons · https://developer.apple.com/design/human-interface-guidelines/alerts · https://developer.apple.com/design/human-interface-guidelines/action-sheets · https://developer.apple.com/design/human-interface-guidelines/context-menus · https://developer.apple.com/design/human-interface-guidelines/edit-menus · https://developer.apple.com/design/human-interface-guidelines/menus · https://developer.apple.com/design/human-interface-guidelines/segmented-controls · https://developer.apple.com/design/human-interface-guidelines/toggles · https://developer.apple.com/design/human-interface-guidelines/pickers · https://developer.apple.com/design/human-interface-guidelines/text-fields · https://developer.apple.com/design/human-interface-guidelines/labels · https://developer.apple.com/design/human-interface-guidelines/scroll-views
+https://developer.apple.com/design/human-interface-guidelines/toolbars · https://developer.apple.com/design/human-interface-guidelines/tab-bars · https://developer.apple.com/design/human-interface-guidelines/sheets · https://developer.apple.com/design/human-interface-guidelines/lists-and-tables · https://developer.apple.com/design/human-interface-guidelines/gestures · https://developer.apple.com/design/human-interface-guidelines/search-fields · https://developer.apple.com/design/human-interface-guidelines/searching · https://developer.apple.com/design/human-interface-guidelines/buttons · https://developer.apple.com/design/human-interface-guidelines/alerts · https://developer.apple.com/design/human-interface-guidelines/action-sheets · https://developer.apple.com/design/human-interface-guidelines/context-menus · https://developer.apple.com/design/human-interface-guidelines/edit-menus · https://developer.apple.com/design/human-interface-guidelines/menus · https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons · https://developer.apple.com/design/human-interface-guidelines/segmented-controls · https://developer.apple.com/design/human-interface-guidelines/toggles · https://developer.apple.com/design/human-interface-guidelines/pickers · https://developer.apple.com/design/human-interface-guidelines/text-fields · https://developer.apple.com/design/human-interface-guidelines/labels · https://developer.apple.com/design/human-interface-guidelines/scroll-views
 
 ---
 
@@ -299,3 +301,51 @@ https://developer.apple.com/design/human-interface-guidelines/layout · https://
 - [ ] **되돌리기 어려운 동작:** 확인 단계를 둔다(Alert/Action sheet). Assistive Access에서는 두 번 확인한다.
 
 https://developer.apple.com/design/human-interface-guidelines/accessibility · https://developer.apple.com/design/human-interface-guidelines/voiceover · https://developer.apple.com/design/human-interface-guidelines/typography · https://developer.apple.com/design/human-interface-guidelines/color · https://developer.apple.com/design/human-interface-guidelines/toggles · https://developer.apple.com/design/human-interface-guidelines/gestures · https://developer.apple.com/design/human-interface-guidelines/inclusion · https://developer.apple.com/design/human-interface-guidelines/writing
+
+---
+
+## 6.5 제스처
+
+| 제스처 | iPhone 에서의 일반적 의미 |
+|---|---|
+| Tap | 컨트롤 실행, 항목 선택 |
+| Swipe | 액션·컨트롤 드러내기 (행 스와이프 액션), 뷰 닫기, 스크롤 |
+| Drag | UI 요소 옮기기 (끌어서 정렬 등) |
+| Touch and hold | 추가 기능 드러내기 (context menu) |
+| Double tap | 확대, 이미 확대돼 있으면 축소 |
+| Zoom (pinch) | 뷰 확대·축소 |
+| Rotate | 선택한 항목 회전 |
+| Shake | 실행 취소·다시 실행 |
+| 세 손가락 swipe / pinch | 실행 취소·다시 실행 / 복사·붙여넣기 |
+
+- **표준 제스처는 사람들이 기대하는 대로 동작시킨다.** 같은 제스처가 화면마다 다른 일을 하지 않게 한다.
+- **커스텀 제스처는 꼭 필요할 때만, 자주 하는 전문 작업에만 둔다.** 표준 제스처를 대체하지 않고 보완한다 (예: 뒤로 가기 단축 제스처가 있어도 Back 버튼은 둔다).
+- **시스템 제스처와 겹치지 않게 한다.** 화면 가장자리 끌기(뒤로), 화면 아래에서 위로 쓸기(홈) 영역에 앱 제스처를 두지 않는다.
+- **제스처로만 할 수 있는 일을 만들지 않는다.** 스와이프 액션·context menu 의 동작은 버튼으로도 할 수 있어야 한다 (접근성 체크리스트 참고).
+- **설계서에는 제스처 → 결과 → 대안 버튼을 함께 적는다.**
+
+https://developer.apple.com/design/human-interface-guidelines/gestures · https://developer.apple.com/design/human-interface-guidelines/context-menus · https://developer.apple.com/design/human-interface-guidelines/sheets
+
+---
+
+## 7. 디자인 분기: Liquid Glass (iOS 26 이상) / 이전 디자인 (iOS 26 미만)
+
+화면 구조, 컴포넌트 선택, 상태, 접근성은 두 디자인이 같다. 달라지는 것은 컨트롤이 놓이는 층과 모양이다. 현재 HIG 원문은 Liquid Glass 기준으로만 쓰여 있다. 아래 "이전 디자인" 칸은 iOS 26 미만에서 시스템 컴포넌트가 보이는 모습이며, 현재 원문에서 근거를 찾을 수 없다. Liquid Glass 칸 중 Sheet 와 Alert 의 모양도 원문에 서술이 없어 iOS 26 시스템 컴포넌트의 실제 모습을 적었다. 나머지 Liquid Glass 칸은 아래 링크의 원문에 근거가 있다.
+
+| 요소 | Liquid Glass | 이전 디자인 |
+|---|---|---|
+| 층 구조 | 컨트롤과 내비게이션은 콘텐츠 위에 뜬 유리 층. 콘텐츠는 바 밑까지 이어진다 | 바가 콘텐츠 위·아래를 잘라 차지한다 |
+| Navigation bar | 배경 없이 투명. 버튼은 유리 capsule·원에 담기고, 바와 콘텐츠의 구분은 scroll edge effect 가 맡는다 | 반투명 배경과 아래 구분선. 버튼은 배경 없는 텍스트·심볼 |
+| 뒤로 버튼 | 유리 원 안의 chevron 심볼 | chevron + 이전 화면 제목 |
+| 주요 액션 (완료 등) | 유리 위에 accent color 를 칠한 prominent 버튼 하나 | 굵은 텍스트 버튼 |
+| Tab bar | 하단에서 떠 있는 유리 capsule. 액세서리가 있으면 스크롤 시 최소화될 수 있다 | 화면 하단에 붙은 반투명 바 |
+| Sheet | 유리 재질. medium detent 는 화면 가장자리에서 떨어져 떠 있다 | 화면 폭 전체, 위쪽 모서리만 둥글다. 뒤 화면이 살짝 줄어든다 |
+| Alert | 유리 재질, 큰 모서리, capsule 버튼 | 불투명 카드, 구분선으로 나뉜 버튼 |
+| 버튼·컨트롤 모양 | capsule·원을 선호하고, 모서리 반경은 감싸는 요소와 동심 | 둥근 사각형 |
+| 색 | 유리에는 색을 아껴 쓴다. 강조는 주요 액션의 배경에만 | 틴트색 텍스트·심볼로 강조 |
+
+- **설계서에는 "디자인에 따라 달라지는 줄" 만 갈라 쓴다.** 진입 전환, 구성 요소의 컴포넌트·모양, 전환·애니메이션 줄이 주로 달라진다. 목적, 상태, 접근성은 두 설계서가 같다.
+- **커스텀 컨트롤에 Liquid Glass 를 남발하지 않는다.** 표준 컴포넌트는 시스템이 알아서 유리 모양을 입힌다. 콘텐츠 층(카드, 리스트 셀)에는 유리를 쓰지 않는다.
+- **clear 유리는 화려한 배경 위에서만 쓴다.** 그 밖에는 regular.
+
+https://developer.apple.com/design/human-interface-guidelines/materials · https://developer.apple.com/design/human-interface-guidelines/toolbars · https://developer.apple.com/design/human-interface-guidelines/tab-bars · https://developer.apple.com/design/human-interface-guidelines/buttons · https://developer.apple.com/design/human-interface-guidelines/color
