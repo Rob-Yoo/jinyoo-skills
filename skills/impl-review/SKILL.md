@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: impl-review
 description: 기준점 (커밋, 브랜치, 태그) 이후의 변경을 Standards 와 Spec 두 축으로 리뷰한다. 브랜치, PR, 작업 중인 변경을 리뷰하거나 "X 이후 리뷰" 를 원할 때 사용한다.
 ---
 
