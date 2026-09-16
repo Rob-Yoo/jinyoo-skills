@@ -12,10 +12,10 @@
 
 쉽게 되돌릴 수 있으면 되돌리면 되고, 의아하지 않으면 아무도 묻지 않고, 대안이 없었으면 남길 것이 없다.
 
-## 위치와 번호
+## 위치와 이름
 
 - 프로젝트에 이미 ADR 디렉토리 (`docs/adr/`, `doc/adr/` 등) 가 있으면 그곳에 쓴다. 없으면 프로젝트 루트의 `Docs/adr/` 에 쓴다. 디렉토리는 첫 ADR 을 쓸 때 만든다.
-- 파일 이름은 `0001-<slug>.md` 다. 번호는 디렉토리에 있는 최댓값에 1을 더한다.
+- 파일 이름은 번호 없이 `<slug>.md` 다. slug 는 결정을 가리키는 영문 kebab-case 이름이다 (예: `keychain-token-storage.md`). 같은 이름이 이미 있으면 겹치지 않게 더 구체적인 이름을 쓴다.
 
 ## 템플릿
 
@@ -27,7 +27,7 @@
 
 한 문단이어도 된다. 아래는 값이 있을 때만 더한다:
 
-- **Status** (`accepted` | `superseded by ADR-NNNN`): 결정이 다시 논의된 적이 있을 때
+- **Status** (`accepted` | `superseded by <slug>.md`): 결정이 다시 논의된 적이 있을 때
 - **Considered Options**: 버린 대안을 기억할 가치가 있을 때
 - **Consequences**: 뻔하지 않은 파급이 있을 때
 
@@ -38,6 +38,6 @@
 쓰기 전에 기존 ADR 제목을 훑어, 이번 결정이 뒤집는 ADR 이 있는지 확인한다.
 
 - 사실이 늘면 본문은 그대로 두고 아래에 `## Update, YYYY-MM-DD` 를 덧붙인다.
-- 결정이 뒤집히면 새 ADR 을 쓰고, 이전 ADR 의 Status 를 `superseded by ADR-NNNN` 으로 바꾼다.
+- 결정이 뒤집히면 새 ADR 을 쓰고, 이전 ADR 의 Status 를 `superseded by <slug>.md` 로 바꾼다.
 
 현재 상태를 설명하는 문서 (`CLAUDE.md`, README 등) 가 그 결정을 다루면, 이유를 거기 다시 쓰지 않고 ADR 을 가리키는 한 줄만 둔다.
