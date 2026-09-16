@@ -1,0 +1,5 @@
+interface:
+  display_name: "PRD"
+  short_description: "기능 아이디어를 질문으로 다듬어 간단한 PRD 를 씁니다"
+policy:
+  allow_implicit_invocation: false
