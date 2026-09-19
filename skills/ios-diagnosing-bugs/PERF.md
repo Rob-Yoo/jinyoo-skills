@@ -22,23 +22,21 @@
 
 ## xctrace (명령줄 Instruments)
 
+이 스킬 디렉토리의 `scripts/trace.sh` 로 기록한다. 앱을 새로 띄우고 pid 로 붙어 기록한 뒤 `--table` 로 고른 표를 XML 로 내보낸다. `--table` 없이 돌리면 기록에 든 표 목록을 보여준다.
+
 ```bash
-L=$(xcrun simctl launch --terminate-running-process <UDID> <bundle id>)   # 출력: "<bundle id>: <pid>"
-xcrun xctrace record --template 'Time Profiler' --device <UDID> --attach "${L##*: }" \
-  --time-limit 10s --output run.trace --no-prompt
-xcrun xctrace export --input run.trace --toc        # 표 목록
-xcrun xctrace export --input run.trace \
-  --xpath '/trace-toc/run[@number="1"]/data/table[@schema="potential-hangs"]'
+scripts/trace.sh --sim <UDID> --bundle-id <id> --seconds 10 --table potential-hangs
+scripts/trace.sh --device <UDID> --bundle-id <id> --template Logging --table os-log
 ```
 
-- 시뮬레이터 앱은 `--attach` 에 이름이 아니라 pid 를 준다. 이름으로는 프로세스를 찾지 못했다.
+- 붙기 전 (앱 시작 직후) 은 기록되지 않는다. 시작 구간은 태그 로그 타임스탬프나 App Launch 템플릿 (미검증) 으로 잰다.
 - Time Profiler 기록에는 `time-profile`, `potential-hangs`, `hang-risks`, `os-signpost`, `os-log` 표가 함께 들어 있다.
-- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Animation Hitches, App Launch, Allocations, Network, Swift Concurrency 템플릿의 기록은 미검증이다.
+- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Time Profiler 는 시뮬레이터·실기기에서, Logging 은 실기기에서 기록과 내보내기를 확인했다. Animation Hitches, App Launch, Allocations, Network, Swift Concurrency 템플릿은 미검증이다.
 - 같은 시나리오를 수정 전후에 같은 명령으로 기록해야 비교가 된다.
 
 ## 메인 스레드 간격 감시
 
-Instruments 없이 hang 을 루프로 만드는 가벼운 probe 다. `CADisplayLink` 나 짧은 주기 `Timer` 로 메인 스레드 콜백 간격을 재고, 기준 (예: 50ms) 을 넘는 간격을 태그 로그로 남긴다. `Timer` 는 스크롤 중 (tracking 모드) 멈추므로 `RunLoop.Mode.common` 에 건다.
+Instruments 없이 hang 을 루프로 만드는 가벼운 probe 다. 이 스킬 디렉토리의 `scripts/MainThreadGapProbe.swift` 를 앱 타깃에 임시로 복사하고 앱 시작 시 `MainThreadGapProbe.start(tag: "[DEBUG-a4f2]")` 를 부른다. 메인 스레드 프레임 간격이 기준 (기본 50ms) 을 넘을 때마다 `print` 태그 로그를 남기므로, `scripts/app-loop.sh --red-if 'main-thread gap'` 이 그대로 red 를 판정한다. 시뮬레이터와 실기기에서 확인했다.
 
 ## 측정으로 가설 가르기
 
