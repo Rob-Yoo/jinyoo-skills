@@ -18,9 +18,10 @@
 | `scripts/trace.sh --sim` | `scripts/trace.sh --device`. Time Profiler (`potential-hangs`) 와 Logging (`os-log`) 의 기록·내보내기를 확인했다 |
 | `scripts/MainThreadGapProbe.swift` | 그대로 쓴다 (확인했다) |
 | `leaks <pid>` | 맥에서 도는 프로세스에만 붙는다. `trace.sh --device ... --template Leaks` 로 기록하되, 누수 표가 `xctrace export` 로 나오지 않으므로 기록 파일을 Instruments 앱에서 연다 (HITL) |
+| 크래시: 콘솔 출력의 오류 줄 | `app-loop.sh` 출력에는 "App terminated due to signal <N>" 만 남는다. 크래시 로그는 `xcrun devicectl device info files --device <UDID> --domain-type systemCrashLogs` 로 찾고 `xcrun devicectl device copy from --device <UDID> --domain-type systemCrashLogs --source <파일>.ips --destination <경로>` 로 받는다 |
 | `xcodebuild test -destination 'platform=iOS Simulator,id=<UDID>'` | `-destination 'platform=iOS,id=<UDID>'` (미검증) |
 | (없음) 메모리 한도로 인한 종료 | 확인하는 도구는 미검증이다. 사용자에게 기기의 분석 데이터에서 `JetsamEvent` 로그를 받아 앱이 종료 대상이었는지 본다 (HITL) |
-| `simctl ui` 설정 변경, Maestro 조작 | `simctl` 은 시뮬레이터 전용이고, Maestro 의 실기기 지원은 미검증이다. 설정과 화면 조작은 `scripts/hitl-loop.template.sh` 로 사람에게 맡긴다 |
+| `simctl ui` 설정 변경, Maestro 조작 | `simctl` 은 시뮬레이터 전용이고, Maestro 의 실기기 지원은 미검증이다. 설정과 화면 조작은 `scripts/hitl-loop.template.sh` 로 사람에게 맡기고, 그동안 템플릿 안에서 `app-loop.sh --device` 로 출력을 받는다 |
 
 ## 정리
 

@@ -10,7 +10,7 @@
 |---|---|---|
 | 화면이 늦게 뜬다 | 진입부터 첫 콘텐츠까지 시간 | 진입·표시 지점의 태그 로그 타임스탬프, 또는 `os_signpost` 구간 |
 | 멈춘다 | 메인 스레드 hang 의 길이·횟수 | Time Profiler 기록의 `potential-hangs` 표, 또는 메인 스레드 간격 감시 |
-| 스크롤이 끊긴다 | hitch 길이·비율 | Animation Hitches 템플릿 |
+| 스크롤이 끊긴다 | 메인 스레드 간격의 길이·횟수 | 메인 스레드 간격 감시 (기준을 끊김 크기에 맞춰 낮춘다) |
 | 앱 시작이 느리다 | 실행부터 첫 화면까지 시간 | App Launch 템플릿 |
 | 특정 작업이 느리다 | 그 구간 시간 | `os_signpost` begin/end, Time Profiler |
 
@@ -30,7 +30,7 @@ scripts/trace.sh --sim <UDID> --bundle-id <id> --seconds 10 --table potential-ha
 
 - 붙기 전 (앱 시작 직후) 은 기록되지 않는다. 시작 구간은 태그 로그 타임스탬프나 App Launch 템플릿 (미검증) 으로 잰다.
 - Time Profiler 기록에는 `time-profile`, `potential-hangs`, `hang-risks`, `os-signpost`, `os-log` 표가 함께 들어 있다.
-- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Time Profiler 는 기록과 내보내기를 확인했다. Animation Hitches, App Launch, Allocations, Network, Swift Concurrency 템플릿은 미검증이다.
+- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Time Profiler 는 기록과 내보내기를 확인했다. Animation Hitches 는 실기기에서만 기록되고 (시뮬레이터: "Hitches is not supported on this platform."), 메인 스레드를 50ms·500ms 막은 실험에서도 `hitches` 표가 비어 있었다: 어떤 조건에서 채워지는지 미검증이라 판정에 쓰지 않는다. App Launch, Allocations, Network, Swift Concurrency 템플릿은 미검증이다.
 - 같은 시나리오를 수정 전후에 같은 명령으로 기록해야 비교가 된다.
 
 ## 메인 스레드 간격 감시

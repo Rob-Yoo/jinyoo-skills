@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 앱 실행 루프: (선택) 빌드 → 설치 → 실행 → 출력 캡처 → 패턴으로 red/green 판정. 시뮬레이터와 실기기 모두.
 # 종료 코드: 0 green, 1 red, 2 준비 실패.
+# 앱이 제한 시간 전에 끝나면 (크래시 등) 패턴이 판정하지 않은 한 red 다.
 #
 # 이 스크립트가 대신 처리하는 환경 함정:
 # - macOS 에는 timeout 이 없다 → 실행 시간 상한을 직접 관리한다.
@@ -27,6 +28,7 @@ Usage: app-loop.sh (--sim <UDID> | --device <UDID|이름>) --bundle-id <id> [opt
   --seconds <n>                실행 시간 상한 (기본: 30)
   --red-if <regex>             출력에 이 패턴이 나오면 red (나오는 즉시 끝낸다)
   --red-unless <regex>         출력에 이 패턴이 끝까지 없으면 red (나오는 즉시 green 으로 끝낸다)
+                               패턴과 무관하게, 앱이 제한 시간 전에 끝나면 (크래시 등) red
   --log-predicate <predicate>  통합 로그도 함께 캡처해 판정에 쓴다 (시뮬레이터만). 예: 'subsystem == "com.example.app"'
   --out <file>                 출력 저장 경로 (기본: ./.app-loop/run.log)
 
@@ -110,12 +112,12 @@ LAUNCH_PID=$!
 
 matches() { cat "$OUT" "$UNIFIED" 2>/dev/null | grep -E -- "$1"; }
 
-VERDICT="" REASON=""
+VERDICT="" REASON="" EXITED=""
 END=$((SECONDS + LIMIT))
 while [ "$SECONDS" -lt "$END" ]; do
   if [ -n "$RED_IF" ] && matches "$RED_IF" >/dev/null; then VERDICT=red; REASON="matched --red-if"; break; fi
   if [ -n "$RED_UNLESS" ] && matches "$RED_UNLESS" >/dev/null; then VERDICT=green; REASON="matched --red-unless"; break; fi
-  if ! kill -0 "$LAUNCH_PID" 2>/dev/null; then REASON="app exited before time limit"; break; fi
+  if ! kill -0 "$LAUNCH_PID" 2>/dev/null; then EXITED=1; break; fi
   sleep 0.5
 done
 
@@ -133,9 +135,10 @@ if [ -n "$PRED" ]; then
 fi
 
 if [ -z "$VERDICT" ]; then
-  if [ -n "$RED_UNLESS" ]; then VERDICT=red; REASON="${REASON:+$REASON; }--red-unless never matched"
-  elif [ -n "$RED_IF" ]; then VERDICT=green; REASON="${REASON:+$REASON; }--red-if never matched"
-  else VERDICT=none; REASON="${REASON:-no assertion given}"
+  if [ -n "$EXITED" ]; then VERDICT=red; REASON="app exited before time limit"
+  elif [ -n "$RED_UNLESS" ]; then VERDICT=red; REASON="--red-unless never matched"
+  elif [ -n "$RED_IF" ]; then VERDICT=green; REASON="--red-if never matched"
+  else VERDICT=none; REASON="no assertion given"
   fi
 fi
 
@@ -143,7 +146,11 @@ echo "RESULT: $VERDICT ($REASON)"
 echo "output: $OUT"
 [ -n "$PRED" ] && echo "unified log: $UNIFIED"
 case "$VERDICT" in
-  red) [ -n "$RED_IF" ] && matches "$RED_IF" | head -5; exit 1 ;;
+  red)
+    if [ -n "$EXITED" ]; then tail -5 "$OUT"
+    elif [ -n "$RED_IF" ]; then matches "$RED_IF" | head -5
+    fi
+    exit 1 ;;
   green) [ -n "$RED_UNLESS" ] && matches "$RED_UNLESS" | head -5; exit 0 ;;
   *) exit 0 ;;
 esac

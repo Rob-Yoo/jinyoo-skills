@@ -79,8 +79,8 @@ fi
 for t in "${TABLES[@]}"; do
   XML="$OUT.$t.xml"
   for attempt in 1 2 3 4 5; do
-    xcrun xctrace export --input "$OUT" \
-      --xpath "/trace-toc/run[@number=\"1\"]/data/table[@schema=\"$t\"]" > "$XML" 2>/dev/null
+    ( xcrun xctrace export --input "$OUT" \
+      --xpath "/trace-toc/run[@number=\"1\"]/data/table[@schema=\"$t\"]" > "$XML" ) 2>/dev/null
     tail -c 30 "$XML" | grep -q '</trace-query-result>' && break
     [ "$attempt" = 5 ] && { echo "export failed after 5 attempts: $t" >&2; exit 2; }
   done

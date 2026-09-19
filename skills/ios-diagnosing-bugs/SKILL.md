@@ -41,7 +41,7 @@ iOS 앱의 어려운 버그를 위한 규율이다. 단계는 이유를 밝힐 �
 ### 만드는 방법 (대략 이 순서로)
 
 1. **실패하는 테스트**: 버그에 닿는 seam 의 XCTest 나 Swift Testing. 테스트 하나만 돌린다: `xcodebuild test -scheme <scheme> -destination 'platform=iOS Simulator,id=<UDID>' -only-testing:<타깃>/<타입>/<테스트>`. 테스트 타깃이 없으면 아래 루프로 먼저 red 를 만들고, 타깃은 Phase 5 에서 seam 을 정한 뒤 만든다.
-2. **로그 단언 실행**: `scripts/app-loop.sh` 로 빌드·설치·실행하고, 증상을 드러내는 태그 로그 (Phase 4) 를 `--red-if`·`--red-unless` 로 단언한다. 문제 화면까지는 launch argument 나 환경변수 (`--env`) 를 읽어 앱이 바로 그 화면을 띄우게 하는 임시 진입 코드로 간다.
+2. **로그 단언 실행**: `scripts/app-loop.sh` 로 빌드·설치·실행하고, 증상을 드러내는 태그 로그 (Phase 4) 를 `--red-if`·`--red-unless` 로 단언한다. 앱이 제한 시간 전에 끝나면 (크래시) 그것만으로 red 다. 문제 화면까지는 launch argument 나 환경변수 (`--env`) 를 읽어 앱이 바로 그 화면을 띄우게 하는 임시 진입 코드로 간다.
 3. **UI 자동화**: XCUITest, 또는 `../ios-sim-test/SKILL.md` 의 시뮬레이터 조작 방법 (Maestro) 으로 화면을 조작하고 화면·로그로 단언한다. 시뮬레이터 설정이 조건이면 `xcrun simctl ui <UDID> content_size|appearance|increase_contrast <값>` 과 `../ios-sim-test/SIM-SETUP.md` 로 바꾼다.
 4. **캡처한 응답 재생**: 실제 네트워크 응답·payload·이벤트를 파일로 저장해 `URLProtocol` stub 이나 테스트 fixture 로 그 코드 경로만 돌린다.
 5. **임시 하네스**: 원본을 임시 디렉토리로 복사해 계측을 넣고 돌리거나, 문제 모듈 하나만 부르는 최소 테스트·앱을 만든다.
