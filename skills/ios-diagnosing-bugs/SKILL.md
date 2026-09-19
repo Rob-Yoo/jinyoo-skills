@@ -14,6 +14,14 @@ iOS 앱의 어려운 버그를 위한 규율이다. 단계는 이유를 밝힐 �
 - **느림·멈춤·끊김**: [PERF.md](PERF.md)
 - **해제되지 않음·메모리 증가**: [MEMORY.md](MEMORY.md)
 
+루프는 시뮬레이터에서 만든다. 다음 중 하나에 걸리면 [DEVICE.md](DEVICE.md) 를 읽고 실기기로 간다. 처음부터 걸리면 실기기에서 시작하고, 진행 중에 걸리면 어느 Phase 에서든 그 순간 전환한다:
+
+- 증상이 실기기에서만 보고됐다 (특정 기종·OS 버전 포함).
+- 시뮬레이터 루프를 조여도 red 가 되지 않는다.
+- 증상이 시뮬레이터에 없는 하드웨어 (카메라, 센서, 햅틱, Bluetooth) 에 달려 있고, 캡처한 데이터 재생 (4번 루프) 으로 대신할 수 없다.
+- 실기기 자원이 원인 후보다: 메모리 한도로 인한 종료, 발열, 성능 절대값.
+- 시뮬레이터에서 고쳐 green 인데 실기기에서 여전히 재현된다.
+
 코드베이스를 탐색할 때 용어집 (`GLOSSARY.md`, `CONTEXT.md` 등) 이 있으면 읽어 관련 모듈의 mental model 을 잡고, 손대는 영역의 ADR 을 확인한다. ADR 위치는 이 스킬 디렉토리 기준 `../grill-with-adr/ADR-FORMAT.md` 를 따른다.
 
 ## Redact
@@ -31,7 +39,7 @@ iOS 앱의 어려운 버그를 위한 규율이다. 단계는 이유를 밝힐 �
 ### 만드는 방법 (대략 이 순서로)
 
 1. **실패하는 테스트**: 버그에 닿는 seam 의 XCTest 나 Swift Testing. 테스트 하나만 돌린다: `xcodebuild test -scheme <scheme> -destination 'platform=iOS Simulator,id=<UDID>' -only-testing:<타깃>/<타입>/<테스트>`. 테스트 타깃이 없으면 아래 루프로 먼저 red 를 만들고, 타깃은 Phase 5 에서 seam 을 정한 뒤 만든다.
-2. **로그 단언 실행**: `scripts/app-loop.sh` 로 빌드·설치·실행하고, 증상을 드러내는 태그 로그 (Phase 4) 를 `--red-if`·`--red-unless` 로 단언한다. 시뮬레이터 (`--sim`) 와 실기기 (`--device`) 모두. 문제 화면까지는 launch argument 나 환경변수 (`--env`) 를 읽어 앱이 바로 그 화면을 띄우게 하는 임시 진입 코드로 간다.
+2. **로그 단언 실행**: `scripts/app-loop.sh` 로 빌드·설치·실행하고, 증상을 드러내는 태그 로그 (Phase 4) 를 `--red-if`·`--red-unless` 로 단언한다. 문제 화면까지는 launch argument 나 환경변수 (`--env`) 를 읽어 앱이 바로 그 화면을 띄우게 하는 임시 진입 코드로 간다.
 3. **UI 자동화**: XCUITest, 또는 `../ios-sim-test/SKILL.md` 의 시뮬레이터 조작 방법 (Maestro) 으로 화면을 조작하고 화면·로그로 단언한다. 시뮬레이터 설정이 조건이면 `xcrun simctl ui <UDID> content_size|appearance|increase_contrast <값>` 과 `../ios-sim-test/SIM-SETUP.md` 로 바꾼다.
 4. **캡처한 응답 재생**: 실제 네트워크 응답·payload·이벤트를 파일로 저장해 `URLProtocol` stub 이나 테스트 fixture 로 그 코드 경로만 돌린다.
 5. **임시 하네스**: 원본을 임시 디렉토리로 복사해 계측을 넣고 돌리거나, 문제 모듈 하나만 부르는 최소 테스트·앱을 만든다.
@@ -40,25 +48,9 @@ iOS 앱의 어려운 버그를 위한 규율이다. 단계는 이유를 밝힐 �
 8. **차분 루프**: 같은 입력을 두 버전이나 두 설정 (Debug/Release, iOS 버전, 기기 크기) 에 돌려 출력을 비교한다.
 9. **HITL 스크립트**: 최후 수단. 실기기 화면 조작처럼 사람이 해야 하면 이 스킬 디렉토리의 `scripts/hitl-loop.template.sh` 로 _그 사람을_ 구동해 루프를 구조화한다. 캡처한 출력이 다시 너에게 온다.
 
+`scripts/` 의 각 파일은 머리 주석에 쓰는 법과 대신 처리하는 환경 함정을 적고 있다: 처음 쓸 때 읽는다. 그 밖의 블로킹 명령은 `scripts/with-timeout.sh` 로 끊는다 (macOS 에는 `timeout` 이 없다).
+
 알맞은 루프를 만들면 버그는 90% 고쳐진 것이다.
-
-### 스크립트
-
-이 스킬 디렉토리의 `scripts/` 에 있다. 각 파일의 머리 주석이 쓰는 법과 대신 처리하는 환경 함정을 적고 있으니, 처음 쓸 때 머리 주석을 읽는다.
-
-- `app-loop.sh`: 빌드 → 설치 → 실행 → 출력 캡처 → 패턴으로 red/green 판정 (종료 코드 0 green, 1 red, 2 준비 실패). 2번 루프의 도구다.
-- `trace.sh`: 앱을 띄우고 pid 로 붙어 Instruments 기록을 남기고 표를 XML 로 내보낸다. [PERF.md](PERF.md) 에서 쓴다.
-- `MainThreadGapProbe.swift`: 앱에 임시로 넣는 메인 스레드 간격 감시. [PERF.md](PERF.md) 에서 쓴다.
-- `with-timeout.sh`: 블로킹 명령에 시간 상한을 건다. macOS 에는 `timeout` 이 없다.
-- `hitl-loop.template.sh`: 9번 루프.
-
-### 실기기
-
-시뮬레이터는 실기기가 아니다. CPU·메모리·네트워크·센서 특성이 다르다: 실기기에서만 나는 증상은 `--device` 루프로 잡는다.
-
-- 빌드에 서명이 필요하다. 어느 개발 팀으로 서명할지 사용자에게 확인하고, 자동 서명이면 `--build` 에 `-allowProvisioningUpdates` 를 함께 준다.
-- 실기기의 통합 로그 (`Logger`·`os_log`) 는 `app-loop.sh` 로 받지 못한다 (`log collect` 에 root 가 필요하다). 판정할 로그는 `print` 태그 로그로 찍거나, `trace.sh --template Logging --table os-log` 로 받는다.
-- 잠긴 기기에서는 실행이 막힐 수 있다 (미검증). 실행이 실패하면 사용자에게 잠금 해제를 요청한다.
 
 ### 루프 조이기
 
@@ -160,5 +152,5 @@ red 가 되면 재현을 **여전히 red 인 가장 작은 시나리오** 로 �
 - [ ] 회귀 테스트가 통과한다 (또는 seam 이 없음을 기록했다)
 - [ ] `[DEBUG-...]` 계측을 모두 지웠다 (접두어로 grep)
 - [ ] 임시 진입 코드, 임시 하네스, 앱에 복사한 probe 파일을 지웠다 (또는 분명히 표시한 디버그 위치로 옮겼다)
-- [ ] 바꾼 시뮬레이터 설정을 원래대로 돌렸고, 실기기에 설치한 계측 빌드를 지우거나 계측 없는 빌드로 다시 설치했다
+- [ ] 바꾼 시뮬레이터 설정을 원래대로 돌렸다 (실기기를 썼으면 [DEVICE.md](DEVICE.md) 의 정리도 마쳤다)
 - [ ] 맞은 가설을 커밋·PR 메시지에 적어 다음 사람이 배우게 했다

@@ -18,7 +18,7 @@
 
 - 같은 조건에서 3회 이상 재고 중앙값을 쓴다.
 - 사용자가 겪는 빌드로 잰다. Release 증상이면 `-configuration Release` 로 빌드한다. Debug 는 최적화가 꺼져 있어 CPU 병목이 부풀려진다.
-- 시뮬레이터 측정은 같은 기기에서의 전후 비교에만 쓴다. 절대값을 주장하려면 실기기에서 잰다.
+- 시뮬레이터 측정은 같은 시뮬레이터에서의 전후 비교에만 쓴다. 절대값이 필요하면 [DEVICE.md](DEVICE.md) 로 실기기에서 잰다.
 
 ## xctrace (명령줄 Instruments)
 
@@ -26,17 +26,16 @@
 
 ```bash
 scripts/trace.sh --sim <UDID> --bundle-id <id> --seconds 10 --table potential-hangs
-scripts/trace.sh --device <UDID> --bundle-id <id> --template Logging --table os-log
 ```
 
 - 붙기 전 (앱 시작 직후) 은 기록되지 않는다. 시작 구간은 태그 로그 타임스탬프나 App Launch 템플릿 (미검증) 으로 잰다.
 - Time Profiler 기록에는 `time-profile`, `potential-hangs`, `hang-risks`, `os-signpost`, `os-log` 표가 함께 들어 있다.
-- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Time Profiler 는 시뮬레이터·실기기에서, Logging 은 실기기에서 기록과 내보내기를 확인했다. Animation Hitches, App Launch, Allocations, Network, Swift Concurrency 템플릿은 미검증이다.
+- 템플릿 목록은 `xcrun xctrace list templates` 로 본다. Time Profiler 는 기록과 내보내기를 확인했다. Animation Hitches, App Launch, Allocations, Network, Swift Concurrency 템플릿은 미검증이다.
 - 같은 시나리오를 수정 전후에 같은 명령으로 기록해야 비교가 된다.
 
 ## 메인 스레드 간격 감시
 
-Instruments 없이 hang 을 루프로 만드는 가벼운 probe 다. 이 스킬 디렉토리의 `scripts/MainThreadGapProbe.swift` 를 앱 타깃에 임시로 복사하고 앱 시작 시 `MainThreadGapProbe.start(tag: "[DEBUG-a4f2]")` 를 부른다. 메인 스레드 프레임 간격이 기준 (기본 50ms) 을 넘을 때마다 `print` 태그 로그를 남기므로, `scripts/app-loop.sh --red-if 'main-thread gap'` 이 그대로 red 를 판정한다. 시뮬레이터와 실기기에서 확인했다.
+Instruments 없이 hang 을 루프로 만드는 가벼운 probe 다. 이 스킬 디렉토리의 `scripts/MainThreadGapProbe.swift` 를 앱 타깃에 임시로 복사하고 앱 시작 시 `MainThreadGapProbe.start(tag: "[DEBUG-a4f2]")` 를 부른다. 메인 스레드 프레임 간격이 기준 (기본 50ms) 을 넘을 때마다 `print` 태그 로그를 남기므로, `scripts/app-loop.sh --red-if 'main-thread gap'` 이 그대로 red 를 판정한다.
 
 ## 측정으로 가설 가르기
 

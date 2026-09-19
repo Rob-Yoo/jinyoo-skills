@@ -27,8 +27,8 @@
   ```
 
   autorelease 된 참조가 남아 있으면 거짓 red 가 나므로 `autoreleasepool` 안에서 만들고 놓는다. XCTest 에서는 `addTeardownBlock { [weak sut] in XCTAssertNil(sut) }` 로 테스트 끝에 단언할 수도 있다.
-- **실행 루프**: 화면을 띄웠다 닫고, `deinit` 에 `print` 태그 로그를 심어 `scripts/app-loop.sh --red-unless '<태그> deinit'` 으로 판정한다. 시뮬레이터와 실기기 모두.
-- **증가 루프**: 같은 동작을 N 번 반복하며 메모리를 재서 기울기를 본다. 시뮬레이터에서는 `leaks <pid>` 출력의 `nodes malloced for <N> KB` 줄을 반복마다 기록한다.
+- **실행 루프**: 화면을 띄웠다 닫고, `deinit` 에 `print` 태그 로그를 심어 `scripts/app-loop.sh --red-unless '<태그> deinit'` 으로 판정한다.
+- **증가 루프**: 같은 동작을 N 번 반복하며 메모리를 재서 기울기를 본다. `leaks <pid>` 출력의 `nodes malloced for <N> KB` 줄을 반복마다 기록한다.
 
 ## 도구
 
@@ -41,7 +41,6 @@ leaks --traceTree=<주소> <pid>                  # 특정 블록을 잡고 있�
 ```
 
 - 시뮬레이터 앱에는 `leaks` 가 바로 붙는다. "not debuggable ... readonly memory" 경고가 붙지만 누수 개수와 메모리 합계는 나온다.
-- `leaks` 는 맥에서 도는 프로세스에만 붙는다. 실기기는 `scripts/trace.sh --device ... --template Leaks` 로 기록하되, 누수 표가 `xctrace export` 로 나오지 않으므로 기록 파일을 Instruments 앱에서 연다 (HITL).
 - `--outputGraph`, `--referenceTree`, `--traceTree` 와 Allocations 템플릿은 미검증이다.
 
 ## 흔한 잔존 경로
