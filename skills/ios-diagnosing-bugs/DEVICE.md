@@ -24,7 +24,7 @@
 
 ## 정리
 
-SKILL.md Phase 6 에 더해 확인한다:
+SKILL.md Phase 6 에 더해 다음을 모두 확인한다. 근거 보고는 Phase 6 과 같다:
 
-- [ ] 기기에 계측 빌드가 남지 않았다: 원래 없던 앱이면 `xcrun devicectl device uninstall app --device <UDID> <bundle id>` 로 지우고, 원래 있던 앱이면 계측 없는 빌드로 다시 설치했다
-- [ ] 바꾼 서명 설정을 되돌렸다
+- 기기에 계측 빌드가 남지 않았다: 원래 없던 앱이면 `xcrun devicectl device uninstall app --device <UDID> <bundle id>` 로 지우고, 원래 있던 앱이면 계측 없는 빌드로 다시 설치했다
+- 바꾼 서명 설정을 되돌렸다
