@@ -14,6 +14,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 <!-- skills:start -->
 | 스킬 | 호출 | 설명 |
 |------|------|------|
+| [code-analyze](skills/code-analyze/SKILL.md) | 자동 호출 가능 | iOS 앱 코드에 대한 질문에 근거·추론·모름을 구분해 답하고, 결함 후보를 찾습니다 |
 | [codebase-design](skills/codebase-design/SKILL.md) | 자동 호출 가능 | deep module 설계 용어와 원칙을 제공합니다 |
 | [cross-grilling](skills/cross-grilling/SKILL.md) | 사용자만 | 다른 에이전트의 교차 검증을 거치며 grilling 을 진행합니다 |
 | [doc-writer-for-agents](skills/doc-writer-for-agents/SKILL.md) | 자동 호출 가능 | 에이전트가 읽는 문서를 씁니다 |
