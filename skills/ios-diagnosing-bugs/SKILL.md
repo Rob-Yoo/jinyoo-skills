@@ -1,7 +1,6 @@
 ---
 name: ios-diagnosing-bugs
-description: iOS 앱의 어려운 버그와 성능 저하를 피드백 루프부터 만들어 진단한다.
-disable-model-invocation: true
+description: iOS 앱의 어려운 버그와 성능 저하를 피드백 루프부터 만들어 진단한다. 크래시, 잘못된 동작, 느림·멈춤·끊김, 해제되지 않음·메모리 증가의 원인을 찾거나 고칠 때 사용한다.
 ---
 
 # iOS Diagnosing Bugs
