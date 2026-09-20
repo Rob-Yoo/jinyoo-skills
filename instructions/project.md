@@ -1,6 +1,6 @@
 ## jinyoo-skills
 
-`.claude/skills/`·`.agents/skills/` 의 스킬은 jinyoo-skills 레포에서 설치된 생성물이다. 스킬을 고칠 때는 그 레포에서 고친다: 여기서 고친 내용은 재설치 때 덮어써진다.
+`.claude/skills/`·`.agents/skills/` 의 스킬은 jinyoo-skills 레포에서 설치된 생성물이다.
 
 - 작업에 맞는 스킬이 있으면 그 스킬의 절차로 진행한다. 둘 이상 맞으면 범위가 좁은 쪽을 쓴다.
 - `code-analyze` 와 `ios-diagnosing-bugs` 는 절차가 무겁다. 가벼운 길로 끝나는 일은 스킬 없이 처리한다:
