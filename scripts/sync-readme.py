@@ -16,7 +16,8 @@ README = ROOT / "README.md"
 START, END = "<!-- skills:start -->", "<!-- skills:end -->"
 
 
-def rows():
+def skills():
+    """skills/*/ 마다 (이름, 사용자만 호출 여부, 한 줄 설명) 과 설정 오류를 돌려준다. install.py 도 쓴다."""
     errors, out = [], []
     for skill_md in sorted(ROOT.glob("skills/*/SKILL.md")):
         name = skill_md.parent.name
@@ -36,8 +37,14 @@ def rows():
             on = lambda b: "있음" if b else "없음"
             errors.append(f"{name}: 사용자만 호출 설정이 한쪽에만 있다 — SKILL.md disable-model-invocation: true "
                           f"{on(user_only)}, openai.yaml allow_implicit_invocation: false {on(no_implicit)}")
-        call = "사용자만" if user_only else "자동 호출 가능"
-        out.append(f"| [{name}](skills/{name}/SKILL.md) | {call} | {desc} |")
+        out.append((name, user_only, desc))
+    return errors, out
+
+
+def rows():
+    errors, found = skills()
+    out = [f"| [{name}](skills/{name}/SKILL.md) | {'사용자만' if user_only else '자동 호출 가능'} | {desc} |"
+           for name, user_only, desc in found]
     return errors, out
 
 

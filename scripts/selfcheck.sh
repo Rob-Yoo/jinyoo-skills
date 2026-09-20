@@ -8,19 +8,36 @@ P="$(mktemp -d)"
 trap 'rm -rf "$P"' EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
-# 1. 빈 프로젝트: 양 host 설치, 지침 파일은 만들지 않음
+# 1. 빈 프로젝트: 양 host 설치, 가이드 블록만 담은 CLAUDE.md 와 그쪽 AGENTS.md symlink
 python3 "$REPO/scripts/install.py" "$P" >/dev/null
 [ -f "$P/.claude/skills/grilling/SKILL.md" ] || fail "claude 스킬 미설치"
 [ -f "$P/.agents/skills/grilling/SKILL.md" ] || fail "codex 스킬 미설치"
 [ -f "$P/.agents/skills/grilling/agents/openai.yaml" ] || fail "openai.yaml 미복사"
-[ ! -e "$P/CLAUDE.md" ] && [ ! -e "$P/AGENTS.md" ] || fail "지침 파일이 생성됨"
 cmp -s "$REPO/skills/grilling/SKILL.md" "$P/.claude/skills/grilling/SKILL.md" || fail "SKILL.md 원본과 다름"
+[ "$(readlink "$P/AGENTS.md")" = "CLAUDE.md" ] || fail "빈 프로젝트에 AGENTS.md symlink 없음"
+[ "$(head -1 "$P/CLAUDE.md")" = "<!-- jinyoo-skills:start -->" ] || fail "빈 프로젝트 CLAUDE.md 가 블록으로 시작하지 않음"
+grep -q '^  - `mission`: ' "$P/CLAUDE.md" || fail "사용자만 스킬 목록에 mission 없음"
+! grep -q '^  - `grilling`: ' "$P/CLAUDE.md" || fail "자동 호출 스킬이 사용자만 목록에 들어감"
+! grep -q '{{USER_ONLY_SKILLS}}' "$P/CLAUDE.md" || fail "자리표시자가 남음"
 
-# 2. CLAUDE.md 만 있으면 AGENTS.md symlink 생성 (내용은 그대로)
-echo "# 기존 지침" > "$P/CLAUDE.md"
-python3 "$REPO/scripts/install.py" "$P" >/dev/null
-[ "$(readlink "$P/AGENTS.md")" = "CLAUDE.md" ] || fail "AGENTS.md symlink 아님"
-[ "$(cat "$P/CLAUDE.md")" = "# 기존 지침" ] || fail "CLAUDE.md 내용 변경됨"
+# 2. 기존 지침은 그대로 두고 블록만 넣고, 재설치하면 블록 안만 갈아 끼운다
+G="$P/guide"; mkdir -p "$G"; echo "# 기존 지침" > "$G/CLAUDE.md"
+python3 "$REPO/scripts/install.py" "$G" >/dev/null
+[ "$(readlink "$G/AGENTS.md")" = "CLAUDE.md" ] || fail "AGENTS.md symlink 아님"
+[ "$(head -1 "$G/CLAUDE.md")" = "# 기존 지침" ] || fail "기존 지침 훼손"
+[ "$(grep -c 'jinyoo-skills:start' "$G/CLAUDE.md")" = 1 ] || fail "블록이 한 번이 아님 (symlink 쪽에 또 씀)"
+echo "뒤에 쓴 지침" >> "$G/CLAUDE.md"
+sed -i '' 's/^## jinyoo-skills$/## 낡은 블록/' "$G/CLAUDE.md"
+python3 "$REPO/scripts/install.py" "$G" >/dev/null
+grep -q '^## jinyoo-skills$' "$G/CLAUDE.md" && ! grep -q '낡은 블록' "$G/CLAUDE.md" || fail "재설치가 블록을 갈아 끼우지 않음"
+[ "$(tail -1 "$G/CLAUDE.md")" = "뒤에 쓴 지침" ] || fail "블록 뒤 지침 훼손"
+before="$(cat "$G/CLAUDE.md")"; python3 "$REPO/scripts/install.py" "$G" >/dev/null
+[ "$before" = "$(cat "$G/CLAUDE.md")" ] || fail "재설치가 같은 내용을 바꿈"
+
+# 2-1. 둘 다 실제 파일이면 양쪽에 블록
+B="$P/both"; mkdir -p "$B"; echo "# C" > "$B/CLAUDE.md"; echo "# A" > "$B/AGENTS.md"
+python3 "$REPO/scripts/install.py" "$B" >/dev/null
+grep -q 'jinyoo-skills:start' "$B/CLAUDE.md" && grep -q 'jinyoo-skills:start' "$B/AGENTS.md" || fail "실제 파일 둘 중 블록 누락"
 
 # 3. 프로젝트 고유 동명 스킬은 skip
 Q="$P/existing"; mkdir -p "$Q/.claude/skills/grilling"

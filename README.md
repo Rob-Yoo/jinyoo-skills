@@ -7,7 +7,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 |------|-----------|
 | Claude Code 스킬 | `<project>/.claude/skills/<name>/` |
 | Codex 스킬 | `<project>/.agents/skills/<name>/` |
-| 지침 문서 | `CLAUDE.md`·`AGENTS.md` 중 한쪽만 있으면 없는 쪽을 symlink 로 연결 (내용은 건드리지 않음) |
+| 지침 문서 | `CLAUDE.md`·`AGENTS.md` 중 한쪽만 있으면 없는 쪽을 symlink 로 연결 (둘 다 없으면 `CLAUDE.md` 생성). 실제 파일에 스킬 사용 가이드를 `<!-- jinyoo-skills:start/end -->` 블록으로 넣고, 재설치 때 블록 안만 갈아 끼운다 |
 
 ## 스킬
 
@@ -64,6 +64,7 @@ skills/
     agents/openai.yaml  Codex UI 메타 + README 목록의 한 줄 설명 (필수, Claude 는 무시)
     references/ 등      SKILL.md 가 참조하는 리소스 (선택)
 instructions/           --global 이 덧붙이는 전역 지침 원문 (karpathy.md, ponytail.md)
+                        project.md: 프로젝트 지침에 넣는 스킬 사용 가이드 원문 ({{USER_ONLY_SKILLS}} 는 설치 때 채움)
 scripts/install.py      설치
 scripts/selfcheck.sh    install.py 셀프체크 + README 스킬 목록 최신 여부 검사
 scripts/sync-readme.py  README 스킬 목록 생성 (--check: 확인만)
