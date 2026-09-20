@@ -23,7 +23,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
 | [hig-design](skills/hig-design/SKILL.md) | 사용자만 | HIG 에 맞춘 iPhone 화면 설계서와 클릭 프로토타입을 만듭니다 |
 | [impl-review](skills/impl-review/SKILL.md) | 자동 호출 가능 | 변경을 Standards 와 Spec 두 축으로 리뷰합니다 |
-| [implement](skills/implement/SKILL.md) | 사용자만 | 테스트 주도 구현과 두 축 리뷰까지 진행합니다 |
+| [implement](skills/implement/SKILL.md) | 자동 호출 가능 | 명세나 작업 단위를 구현하고 두 축 리뷰까지 진행합니다 |
 | [ios-diagnosing-bugs](skills/ios-diagnosing-bugs/SKILL.md) | 자동 호출 가능 | iOS 앱의 어려운 버그와 성능 저하를 피드백 루프부터 만들어 진단합니다 |
 | [ios-sim-test](skills/ios-sim-test/SKILL.md) | 사용자만 | iOS 시뮬레이터로 체크리스트를 판정하고 근거 보고서를 만듭니다 |
 | [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
