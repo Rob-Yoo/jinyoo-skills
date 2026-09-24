@@ -19,6 +19,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [cross-grilling](skills/cross-grilling/SKILL.md) | 사용자만 | 다른 에이전트의 교차 검증을 거치며 grilling 을 진행합니다 |
 | [doc-writer-for-agents](skills/doc-writer-for-agents/SKILL.md) | 자동 호출 가능 | 에이전트가 읽는 문서를 씁니다 |
 | [explain-for-junior](skills/explain-for-junior/SKILL.md) | 자동 호출 가능 | 실제 예시와 애니메이션으로 주니어에게 설명합니다 |
+| [grill-html](skills/grill-html/SKILL.md) | 사용자만 | grilling 라운드를 결정의 design space 를 펼친 HTML 페이지로 묻습니다 |
 | [grill-with-adr](skills/grill-with-adr/SKILL.md) | 사용자만 | grilling 후 남길 결정을 ADR 로 기록합니다 |
 | [grilling](skills/grilling/SKILL.md) | 자동 호출 가능 | 한 라운드씩 질문을 던지며 생각을 검증합니다 |
 | [hig-design](skills/hig-design/SKILL.md) | 사용자만 | HIG 에 맞춘 iPhone 화면 설계서와 클릭 프로토타입을 만듭니다 |

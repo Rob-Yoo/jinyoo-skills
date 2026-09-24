@@ -1,0 +1,5 @@
+interface:
+  display_name: "Grill HTML"
+  short_description: "grilling 라운드를 결정의 design space 를 펼친 HTML 페이지로 묻습니다"
+policy:
+  allow_implicit_invocation: false
