@@ -31,9 +31,9 @@ disable-model-invocation: true
 
 네 줄로 보고한다.
 
-- 대상: 파일 경로와 줄 수, 또는 모듈 경계. 증상으로 받았으면 여기서 파일로 바꾼다.
+- 대상: 파일 경로와 줄 수, 또는 모듈. 증상으로 받았으면 여기서 파일로 바꾼다.
 - 모자: 요청에 기능 변경이 섞였는지.
-- 규모: 파일·타입 하나면 Phase 3 으로 끝난다. 공개 계약, 모듈 경계, 여러 모듈의 호출처에 걸치면 이 스킬 디렉토리의 `SYSTEM-SCALE.md` 를 Phase 3 에서 함께 따른다.
+- 규모: 파일·타입 하나면 Phase 3 으로 끝난다. 공개 계약, 모듈 사이 seam, 여러 모듈의 호출처에 걸치면 이 스킬 디렉토리의 `SYSTEM-SCALE.md` 를 Phase 3 에서 함께 따른다.
 - 착수 가능 여부.
 
 ## Phase 1 — 안전망 (게이트 1)
@@ -59,6 +59,7 @@ characterization test 는 리팩터링이 아니므로 별도 커밋으로 먼�
 - 진단에 쓴 측정 (줄 수, 타입·필드·멤버 수 등) 과 그 명령을 적어 둔다. 재측정에 같은 자를 쓴다.
 - 이미 사라져서 뺀 항목은 어느 커밋에서 사라졌는지 적는다 (`git log -S'<특징적 조각>' --oneline`). 그래야 진단 중에 고친 것이 아님이 드러난다.
 - 진단에 *Shotgun Surgery*, *Duplicated Code*, *Repeated Switches* 가 있으면 이 스킬 디렉토리의 `CO-REFACTOR.md` 로 함께 고칠 대상을 실측한다.
+- *Middle Man*, *Speculative Generality*, *Shotgun Surgery* 는 `../codebase-design/SKILL.md` 의 원칙으로 판정한다: 지워도 복잡도가 호출처에 다시 나타나지 않으면 (deletion test) *Middle Man*, 운영·테스트를 합쳐 adapter 가 하나뿐인 seam 은 *Speculative Generality*, 흩어진 편집은 locality 부족이다. 여러 shallow module 을 합쳐야 풀리면 `../codebase-design/DEEPENING.md` 로 의존성을 분류하고, 처방은 Fowler 기법 (*Inline Class*, *Combine Functions into Class* 등) 으로 적는다.
 
 ```
 | # | smell        | 위치               | 기법            | 스텝 | 위험 |

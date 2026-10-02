@@ -17,13 +17,13 @@ TDD 는 red → green 루프다. 이 스킬은 그 루프가 남길 가치가 �
 
 ## Seam: 테스트가 놓이는 곳
 
-**seam** 은 테스트하는 공개 경계다: 안을 들여다보지 않고 동작을 관찰하는 interface. 테스트는 seam 에 살고, 내부에 대고 쓰지 않는다.
+**seam** 은 모듈의 interface 가 사는 자리다. 테스트는 seam 에서 interface 로 동작을 관찰하고, 내부에 대고 쓰지 않는다.
 
 **미리 합의한 seam 에서만 테스트한다.** 테스트를 쓰기 전에 테스트할 seam 을 적고 사용자에게 확인받는다. 확인받지 않은 seam 에는 테스트를 쓰지 않는다. 모든 것을 테스트할 수는 없으므로, seam 을 먼저 합의하는 것이 테스트 노력을 모든 경계 사례가 아니라 핵심 경로와 복잡한 로직에 쓰게 하는 방법이다.
 
 묻는다: "공개 interface 는 무엇이고, 어느 seam 을 테스트할까?" 제안하는 seam 마다 무엇을 잡고 무엇을 놓치는지 한 줄씩 붙인다.
 
-그 interface 의 모양 자체가 문제일 때 (모듈이 얼마나 깊어야 하나, seam 을 어디 두나, interface 가 무엇을 내보이나) 는 형제 스킬 `../codebase-design/SKILL.md` 의 용어를 쓴다. module, interface, depth, seam, adapter, leverage, locality 용어의 공용 원천이고, 진행할 세션이 아니라 참고할 reference 다.
+seam·interface 등 설계 용어의 정의와 판정 원칙은 형제 스킬 `../codebase-design/SKILL.md` 에 있다. 진행할 세션이 아니라 참고할 reference 다. seam 후보를 고를 때 두 원칙을 적용한다: interface 가 곧 테스트 표면이다 (interface 너머를 테스트하고 싶으면 모듈 모양을 의심한다), adapter 하나면 가설의 seam 이다.
 
 ## 루프를 쓸지
 

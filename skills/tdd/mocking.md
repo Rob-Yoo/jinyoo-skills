@@ -1,6 +1,6 @@
 # 언제 mock 하나
 
-**시스템 경계**에서만 mock 한다:
+**외부 의존성을 받는 seam** 에서만 mock 한다 (의존성 분류는 `../codebase-design/DEEPENING.md`):
 
 - 외부 API (결제, 이메일 등)
 - 데이터베이스 (때때로: 테스트 DB 가 낫다)
@@ -15,7 +15,7 @@ mock 하지 않는 것:
 
 ## mock 하기 쉬운 설계
 
-시스템 경계에서는 mock 하기 쉬운 interface 를 설계한다:
+그 seam 에는 mock 하기 쉬운 interface 를 설계한다:
 
 **1. 의존성 주입을 쓴다**
 
