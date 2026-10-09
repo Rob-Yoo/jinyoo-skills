@@ -1,5 +1,5 @@
 interface:
   display_name: "iOS Sim Test"
-  short_description: "iOS 시뮬레이터로 체크리스트를 판정하고 근거 보고서를 만듭니다"
+  short_description: "iOS 시뮬레이터·실기기로 체크리스트를 판정하고 근거 보고서를 만듭니다"
 policy:
   allow_implicit_invocation: false

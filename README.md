@@ -26,7 +26,7 @@ Claude Code · Codex 가 함께 쓰는 개인 스킬의 단일 소스(SSOT).
 | [impl-review](skills/impl-review/SKILL.md) | 자동 호출 가능 | 변경을 Standards 와 Spec 두 축으로 리뷰합니다 |
 | [implement](skills/implement/SKILL.md) | 자동 호출 가능 | 명세나 작업 단위를 구현하고 두 축 리뷰까지 진행합니다 |
 | [ios-diagnosing-bugs](skills/ios-diagnosing-bugs/SKILL.md) | 자동 호출 가능 | iOS 앱의 어려운 버그와 성능 저하를 피드백 루프부터 만들어 진단합니다 |
-| [ios-sim-test](skills/ios-sim-test/SKILL.md) | 사용자만 | iOS 시뮬레이터로 체크리스트를 판정하고 근거 보고서를 만듭니다 |
+| [ios-sim-test](skills/ios-sim-test/SKILL.md) | 사용자만 | iOS 시뮬레이터·실기기로 체크리스트를 판정하고 근거 보고서를 만듭니다 |
 | [mission](skills/mission/SKILL.md) | 사용자만 | 큰 기능을 계획부터 Phase 실행, ADR 작성까지 진행합니다 |
 | [prd](skills/prd/SKILL.md) | 사용자만 | 기능 아이디어를 질문으로 다듬어 간단한 PRD 를 씁니다 |
 | [refactor-like-fowler](skills/refactor-like-fowler/SKILL.md) | 사용자만 | Fowler 의 규율로 재작성 없이 한 기법씩 리팩터링합니다 |

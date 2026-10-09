@@ -22,4 +22,4 @@ xcrun simctl spawn <UDID> defaults write com.apple.Accessibility ReduceMotionEna
 
 ## 시뮬레이터로 확인할 수 없는 것
 
-진동 (햅틱) 은 시뮬레이터에서 확인할 수 없다. 해당 항목은 "확인 불가, 실기기 필요" 로 판정한다.
+진동 (햅틱) 은 시뮬레이터와 실기기 모두 에이전트가 확인할 수 없다. 해당 항목은 "확인 불가, 사람 확인 필요" 로 판정한다.
